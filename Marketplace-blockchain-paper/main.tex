@@ -58,7 +58,7 @@
 \newcommand{\tati}{\ensuremath{\mathit{TATI}}}
 \newcommand{\etm}{\ensuremath{\mathit{ETM}}}
 \newcommand{\tp}{\ensuremath{\mathit{TP}}}
-\newcommand{\sc}{\ensuremath{\mathit{SC}}}
+\newcommand{\smartc}{\ensuremath{\mathit{SC}}}
 
 %
 % The following packages can be found on http:\\www.ctan.org
@@ -210,7 +210,7 @@ We assume, as in standard IoT data streaming, that the exchange of streaming dat
 The goal of the marketplace is to enable trading of such streaming data between any pair of  participants, i.e., a data Provider  $P$ and a Consumer $C$, while offering guarantees, i.e., 
 regarding the max  loss incurred by either of them in case of adversarial behaviour, as well as to resolve disputes about the amount of data exchanged.
 
-To achieve this, we augment the data exchange with the exchange of \textit{data receipts} between $C$ and $P$, which occurs at regular intervals and throughout the duration of the data stream. Such receipts are exchanged as part of transactions that are mediated by a smart contract, denoted \sc, on the blockchain. 
+To achieve this, we augment the data exchange with the exchange of \textit{data receipts} between $C$ and $P$, which occurs at regular intervals and throughout the duration of the data stream. Such receipts are exchanged as part of transactions that are mediated by a smart contract, denoted \smartc, on the blockchain. 
 The length of the exchange interval, denoted as Batch Size or \bs, is set at the time of trading agreement negotiation and is designed to let providers $P$ control the level of risk they are prepared to tolerate given limited trust in $C$.
 
 The model described in this section consists of the following elements:
@@ -268,22 +268,27 @@ The agreement contains (i) details of a specific data offering \doff, the time i
 \subsection{Data Receipt protocol}  \label{sec:protocol}
 
 Once the trade agreement is in force, Consumer $C$ is allowed to subscribe to Provider $P$'s stream.
-When both parties comply with the agreement and data transfer takes place as expected, at the end of the \tati{} interval $C$ informs the smart contract \sc{} that the agreement has been fulfilled, and \sc{} proceeds to settle the payment as per the agreement.
-Suppose however that $C$ fails to inform \sc. This may be because $C$ actually failed to receive some of the data in the stream, or because it fraudolently \textit{claims} not to have received the data.
-In our marketplace, we assume that \sc{} is unable to distinguish between these two events, i.e., there is no requirement for the data broker to keep a (verifiably truthful) log of its message delivery.
-In this situation, the only possible course for \sc{} is to believe $C$'s claim, and to withhold $P$'s payment as a consequence.
+When both parties comply with the agreement and data transfer takes place as expected, at the end of the \tati{} interval $C$ informs the smart contract \smartc{} that the agreement has been fulfilled, and \smartc{} proceeds to settle the payment as per the agreement.
+Suppose however that $C$ fails to inform \smartc. This may be because $C$ actually failed to receive some of the data in the stream, or because it fraudolently \textit{claims} not to have received the data.
+In our marketplace, we assume that \smartc{} is unable to distinguish between these two events, i.e., there is no requirement for the data broker to keep a (verifiably truthful) log of its message delivery.
+In this situation, the only possible course of action for \smartc{} is to believe $C$'s claim, and to withhold $P$'s payment as a consequence.
 Thus, assuming minimal accountability on the broker and no trust amongst participants, $P$ may become the victim of $C$'s fraud.
 
 Our approach to mitigate this possibility is to introduce checkpoints throughout the duration of data delivery. 
 The distance between two checkpoints is defined by the batch size \bs, introduced earlier. 
-According to this protocol, at each checkpoint $C$ is expected to send a \textit{data receipt} to \sc as part of a blockchain transaction, which acknowledges receipt of one batch of data from $P$.
-When this happens, sc{} records the receipt and then informs $P$. 
-if $P$ does not receive a message from \sc, it eventually times out and stops the stream (in practice, $C$'s subscription to the stream is cancelled), effectively terminating the trade agreement.
+According to this protocol, at each checkpoint $C$ is expected to send a \textit{data receipt} to \smartc{} as part of a blockchain transaction, which acknowledges receipt of one batch of data from $P$.
+When this happens, \smartc{} records the receipt and then informs $P$. 
+If $P$ does not receive a message from \smartc, it eventually times out and stops the stream (in practice, $C$'s subscription to the stream is cancelled), effectively terminating the trade agreement.
 
 This mechanism provides an upper bound to the loss of data incurred by $P$ in case of fraud, which is a function of \bs, as that determines the distance between two checkpoints (by ``loss of data'' here we mean, $P$ providing streaming messages to $CR$ without getting paid for them).
-Importantly, when using blockchains that are incur a fee for executing smart contracts, like Ethereum, there is a trade-off between the risk of losing data and the cost of engaging in a long-running transaction with many checkpoints along the way, because each checkpoint incurs a transaction fee.
+By setting \bs{} to a small value, data loss will be limited to one or at most a few data batches (see below for details). 
+However, a large \bs{} exposes $P$ to a higher risk of fraud.
+Intuitively, $P$ will set \bs{} to a value that is determined by how much $C$ can be trusted. 
+In the following we make this intuition precise by establishing a connection between \bs{} and the participants' reputation score.
+
+Setting \bs{} correctly for each transaction is critical to achieve a sustainable marketplace, because checkpoints can be costly as they are smart contract transactions, which in blockhain models like Ethereum incur a fee. There is therefore a trade-off between the risk of losing data and the cost of engaging in a long-running transaction with many checkpoints along the way.
 In our experimental evaluation (Sec.~\ref{sec:evaluation}) we explore this trade-off in detail. 
-in the rest of this section, however, we provide a theoretical analysis of this protocol.
+In the rest of this section, however, we provide a theoretical analysis of this simple protocol.
 
 
 
@@ -525,7 +530,7 @@ As shown in Figure\ref{SSD}, the marketplace starts that each participant must r
 The data provider at the start time of the subscription starts sending the data batches as agreed in the TA. When a first batch has been sent, a consumer should send a receipt to the smart contract reporting what he received. A smart contract will check if the data received is equal to the batch size set in the agreement, meanwhile, the provider is paused and waiting for the acknowledgment to be triggered. If the data delivered was not equal the data batch, the smart contract will trigger an event that the trade is going to fail and therefore, the reputation and settlement contract ends the the trade immediately and release the tokens to the producer as mush as reported in the receipt and return back the rest to the consumer balance. Eventually, a reputation score is updated and eventually the trade is labeled failed. 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Implementation and evaluation} \label{Impl&Evaluation}
+\section{Implementation and evaluation} \label{sec:evaluation}
 
 The decentralized brokered IoT data marketplace model has implemented the trade management and the settlement service as set of smart contracts in the blockchain written by the high-level language \textit{Solidity} in Ethereum platform. 
 
