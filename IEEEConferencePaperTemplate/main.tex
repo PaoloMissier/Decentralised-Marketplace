@@ -1,7 +1,3 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%2345678901234567890123456789012345678901234567890123456789012345678901234567890
-%        1         2         3         4         5         6         7         8
-
 \documentclass[letterpaper, 10 pt, conference]{ieeeconf}  % Comment this line out
                                                           % if you need a4paper
 %\documentclass[a4paper, 10pt, conference]{ieeeconf}      % Use this line for a4
@@ -25,11 +21,9 @@
 \usepackage{adjustbox} % by awa
 %***
 \usepackage{listings}
+\usepackage{url}
 
 \usepackage{array, makecell} %
-
-
-
 
 \usepackage[linesnumbered,ruled]{algorithm2e} % used for algorithms
 \newcommand\mycommfont[1]{\footnotesize\ttfamily\textcolor{blue}{#1}}
@@ -50,13 +44,31 @@
 \newcommand{\mathcenter}{\@fleqnfalse}
 \makeatother
 
+\newcommand{\mynote}[1]{{\leavevmode\smaller\itshape\color{red}\{#1\}}}
+\sethlcolor{highlight}
+\newcommand{\mycomment}[2]{\hl{#1} {{\leavevmode\smaller\color{red}\itshape\{#2\}}}}
+
+\newcommand{\anote}[1]{{\leavevmode\smaller\itshape\color{red}\{#1\}}}
+
+
+\newcommand{\ep}{\ensuremath{\mathit{EP}}}
+\newcommand{\bs}{\ensuremath{\mathit{BS}}}
+\newcommand{\ti}{\ensuremath{\mathit{TI}}}
+\newcommand{\mr}{\ensuremath{\mathit{MR}}}
+\newcommand{\up}{\ensuremath{\mathit{UP}}}
+\newcommand{\doff}{\ensuremath{\mathit{DO}}}
+\newcommand{\tati}{\ensuremath{\mathit{TATI}}}
+\newcommand{\etm}{\ensuremath{\mathit{ETM}}}
+\newcommand{\tp}{\ensuremath{\mathit{TP}}}
+
+%
 % The following packages can be found on http:\\www.ctan.org
-%\usepackage{graphics} % for pdf, bitmapped graphics files
+\usepackage{graphics} % for pdf, bitmapped graphics files
 %\usepackage{epsfig} % for postscript graphics files
 %\usepackage{mathptmx} % assumes new font selection scheme installed
 %\usepackage{times} % assumes new font selection scheme installed
-%\usepackage{amsmath} % assumes amsmath package installed
-%\usepackage{amssymb}  % assumes amsmath package installed
+\usepackage{amsmath} % assumes amsmath package installed
+\usepackage{amssymb}  % assumes amsmath package installed
 
 \title{\LARGE \bf
 Decentralized Marketplace for Brokered IoT Data Trades using Blockchain
@@ -86,12 +98,6 @@ Decentralized Marketplace for Brokered IoT Data Trades using Blockchain
 
 
 \begin{document}
-
-\newcommand{\mynote}[1]{{\leavevmode\smaller\itshape\color{red}\{#1\}}}
-\sethlcolor{highlight}
-\newcommand{\mycomment}[2]{\hl{#1} {{\leavevmode\smaller\color{red}\itshape\{#2\}}}}
-
-\newcommand{\anote}[1]{{\leavevmode\smaller\itshape\color{red}\{#1\}}}
 
 
 \maketitle
@@ -130,7 +136,7 @@ The remainder of this paper is organized as follows. Section \ref{CentModel} sho
 
 \begin{figure}
   \caption{Centralized Brokered IoT Data Marketplace Architecture}
-  \label{Cent}
+  \label{fig:brokered-data-exchange}
   \includegraphics[scale=0.4]{Cent}
 %   \centering
 
@@ -199,20 +205,70 @@ The project is essentially a blockchain that was created specially for the IoT a
 It is designed to cope the blockchain limitation in scalability where in IOTA, all real-time IoT data are stored on the chain. 
 unlike the IOTA project \cite{20}, there is no need to record all IoT data in the chain and only need to store the metadata and the trade details between a producer and a consumer as a trade agreement.
 
-\section{Marketplace Model} \label{MKModel}
+\section{Marketplace Model} \label{sec:MKModel}
 
-\subsection{Marketplace Stakeholders}
+We assume, as in standard IoT data streaming, that the exchange of streaming data may be mediated by some transaction-agnostic broker infrastructure, such as the one shown in Fig.~\ref{fig:brokered-data-exchange}.
+The goal of the marketplace is to enable trading of such streaming data between any pair of  participants, i.e., a data Provider  $P$ and a Consumer $C$, while offering guarantees, i.e., 
+regarding the max  loss incurred by either of them in case of adversarial behaviour, as well as to resolve disputes about the amount of data exchanged.
 
-The decentralized marketplace architecture introduces a new layer that uses the blockchain technology upon the brokered IoT data protocol, shown in Figure 1. It is a public platform for any owner has a real-time IoT data stream and willing to monetize his data for economic benefits. Also, it is for anyone who has the desire to have a trade with data stream provider for various purposes such as analysis, aggregation, ...etc. 
+To achieve this, we augment the data exchange with the exchange of \textit{data receipts} between $C$ and $P$, which occurs at regular intervals and throughout the duration of the data stream. Such receipts are exchanged as part of transactions that are mediated by a smart contract on the blockchain. 
+The length of the exchange interval, denoted as Batch Size or \bs, is set at the time of trading agreement negotiation and is designed to let providers $P$ control the level of risk they are prepared to tolerate given limited trust in $C$.
+
+The model described in this section consists of the following elements:
+\begin{enumerate}
+	
+	\item The description of data offered by a Producer;
+	
+	\item A trade agreement, which includes details of the data to be exchanged and the exchange protocol, the corresponding market value, and additional parameters such as the \bs mentioned above;
+	
+	\item A protocol for the exchange of data receipts, which includes both parties in addition to a neutral smart contract;
+	
+	\item A reputation model, which allows a score to be assigned to every pair $P$ and $C$ of participants at the end of each transaction they are involved in. 
+	Participants may use reputation scores to asses the risk of entering into an agreement with an untrusted participant.
+
+\end{enumerate}
+
+In this paper we are concerned primarily with (1-3), which are described in detail below. Regarding (4), we are going to assume that a reputation model is in place and that a up-to-date score is associated with each participant, without concern for how it works. The design of a customised reputation model is the object of our ongoing work, and it is beyond the scope of this paper.
+
+As we will see, the smart contract is responsible for each transaction associated with (1-3), and specifically for recording (i) the specification of the data offering, (ii) the trade agreement, and (iii) each data receipt.
 
 \subsection{Data Offering}
 
-In the marketplace, a data provider publishes offers in the blockchain to what data he has to let consumers choose from and subscribe. A producer should interact with the marketplace smart contract to deploy his offers in the network. Each offer is a new offer object stored in the blokchain. Each offer consist of: (1) The time interval of this offer ($TI$). It should set the start and end time that the he is willing to provide this data. (2) A message rate (Rate)(in a time unit e.g. seconds) that would be used to send the data through the broker (3) The price of a message unit (UP), and (4) the minimum reputation ($Min_{rep}$) for candidate consumers who can choose this offer (optional).  
+The first function of the smart contract is to let data Providers publish their data offerings on the blockchain, where they can be then discovered by prospective Consumers. 
+Concretely, a data stream consists of an unbound sequence of messages, and a data offering specifies an endpoint \ep where data can be obtained. Consistent with the message-based view of streams, in our experimental testbed endpoints are \textit{topics} associated to standard MQTT  IoT data brokers. A topic advertised by a Provider uniquely identifies that Provider's stream. A Consumer is allowed subscribe to a topic subject to the conditions set in the Trade Agreement (described next).
 
-\subsection{Trade Agreement}
-A trade agreement is the key element in our model. It is a digital agreement between a producer and a consumer which include all a trade details they have. It is kept on the blockchain after signed by both by using their account private key in the Ethereum blockchain. A trade agreement is like a traditional contract between any two parties would have a trade in the real world, but here it is immutable which means any obligations, conditions or any financial affairs won’t be changed forever neither before nor after trade done. Once it is created and published in the blockchain, it is no longer can be amended. 
+\anote{SHAIMAA please check that this makes sense -- you say nothing about how the data is actually exchanged! i am not sure that referring to the centralised case in sec 1 is appropriate here??}
 
-Each trade agreement TA consists of: a producer address in the blockchain, consumer address, a message rate (Rate), a data batch size (BS), a trade time interval with specifying the start and the end time (TATI), the total messages which are expected to be delivered in the time interval (ETM) and the total data price which is credit from consumer balance (TP). 
+A data offering $\doff = \langle \ep, \ti, \mr, \up \rangle$ includes, in addition to the endpoint \ep, a specification of (i) The time interval \ti{} during which the offer is valid, (ii) the streaming message rate \mr, eg. in messages/second, (iii) the unit cost \up{} of messages in the stream.
+
+\anote{I have omitted the min reputation here as I think it is confusing at this stage. Introduced later instead.}
+
+
+%
+%
+%
+%In the marketplace, a data provider to what data he has to let consumers choose from and subscribe. A producer should interact with the marketplace smart contract to deploy his offers in the network. Each offer is a new offer object stored in the blokchain. Each offer consist of: (1) The time interval of this offer ($TI$). It should set the start and end time that the he is willing to provide this data. (2) A message rate (Rate)(in a time unit e.g. seconds) that would be used to send the data through the broker (3) The price of a message unit (UP), and (4) the minimum reputation ($Min_{rep}$) for candidate consumers who can choose this offer (optional).  
+%
+
+%\subsection{Marketplace Stakeholders}
+%
+%The decentralized marketplace architecture introduces a new layer that uses the blockchain technology upon the brokered IoT data protocol, shown in Figure 1. It is a public platform for any owner has a real-time IoT data stream and willing to monetize his data for economic benefits. Also, it is for anyone who has the desire to have a trade with data stream provider for various purposes such as analysis, aggregation, ...etc. 
+
+
+\subsection{Trade Agreement} \label{sec:agreement}
+
+The trade agreement is a legally binding contract (we use the term ``agreement'' to avoid confusion with smart contracts) between a producer and a consumer, which defines the terms of the data exchange.
+An agreement comes into force when (i) it is signed by both parties using their blockchain account keys (Ethereum in our implementation), and (ii) a smart contract transaction containing the agreement is committed to the blockchain, at which point it can no longer be amended.
+The agreement contains (i) details of a specific data offering \doff, the time interval \tati{} during which the agreement is in force, the total number of messages \etm{} that are expected to be delivered during the time interval, and the total price \tp, which is simply based on the unit price \up{} and the interval.
+
+
+
+\anote{BELOW NOT EDITED  -- PM}
+
+%
+%
+%
+%Each trade agreement TA consists of: a producer address in the blockchain, consumer address, a message rate (Rate), a data batch size (BS), a trade time interval with specifying the start and the end time (TATI), the total messages which are expected to be delivered in the time interval (ETM) and the total data price which is credit from consumer balance (TP). 
 
 \subsection{Data Batching}
 With the absence of central trust, our approach is a receipt-based model. A consumer is required to send a receipt for every data he received, for this, the real-time stream has to be divided into batches.
