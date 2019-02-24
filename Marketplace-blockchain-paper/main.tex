@@ -59,6 +59,7 @@
 \newcommand{\etm}{\ensuremath{\mathit{ETM}}}
 \newcommand{\tp}{\ensuremath{\mathit{TP}}}
 \newcommand{\smartc}{\ensuremath{\mathit{SC}}}
+\newcommand{\rtEst}{\ensuremath{\widehat{\mathit{RT}}}}
 
 %
 % The following packages can be found on http:\\www.ctan.org
@@ -269,7 +270,7 @@ The agreement contains (i) details of a specific data offering \doff, the time i
 
 Once the trade agreement is in force, Consumer $C$ is allowed to subscribe to Provider $P$'s stream.
 When both parties comply with the agreement and data transfer takes place as expected, at the end of the \tati{} interval $C$ informs the smart contract \smartc{} that the agreement has been fulfilled, and \smartc{} proceeds to settle the payment as per the agreement.
-Suppose however that $C$ fails to inform \smartc. This may be because $C$ actually failed to receive some of the data in the stream, or because it fraudolently \textit{claims} not to have received the data.
+Suppose however that $C$ fails to inform \smartc. This may happen because $C$ actually failed to receive some of the data in the stream, or because it fraudolently \textit{claims} not to have received the data.
 In our marketplace, we assume that \smartc{} is unable to distinguish between these two events, i.e., there is no requirement for the data broker to keep a (verifiably truthful) log of its message delivery.
 In this situation, the only possible course of action for \smartc{} is to believe $C$'s claim, and to withhold $P$'s payment as a consequence.
 Thus, assuming minimal accountability on the broker and no trust amongst participants, $P$ may become the victim of $C$'s fraud.
@@ -280,48 +281,81 @@ According to this protocol, at each checkpoint $C$ is expected to send a \textit
 When this happens, \smartc{} records the receipt and then informs $P$. 
 If $P$ does not receive a message from \smartc, it eventually times out and stops the stream (in practice, $C$'s subscription to the stream is cancelled), effectively terminating the trade agreement.
 
-This mechanism provides an upper bound to the loss of data incurred by $P$ in case of fraud, which is a function of \bs, as that determines the distance between two checkpoints (by ``loss of data'' here we mean, $P$ providing streaming messages to $CR$ without getting paid for them).
-By setting \bs{} to a small value, data loss will be limited to one or at most a few data batches (see below for details). 
-However, a large \bs{} exposes $P$ to a higher risk of fraud.
-Intuitively, $P$ will set \bs{} to a value that is determined by how much $C$ can be trusted. 
-In the following we make this intuition precise by establishing a connection between \bs{} and the participants' reputation score.
 
-Setting \bs{} correctly for each transaction is critical to achieve a sustainable marketplace, because checkpoints can be costly as they are smart contract transactions, which in blockhain models like Ethereum incur a fee. There is therefore a trade-off between the risk of losing data and the cost of engaging in a long-running transaction with many checkpoints along the way.
-In our experimental evaluation (Sec.~\ref{sec:evaluation}) we explore this trade-off in detail. 
-In the rest of this section, however, we provide a theoretical analysis of this simple protocol.
+This mechanism provides an upper bound to the loss of data incurred by $P$ in case of fraud, which is a function of \bs, as that determines the distance between two checkpoints (by ``loss of data'' here we mean, $P$ providing streaming messages to $C$ without getting paid for them).
+By setting \bs{} to a small value, data loss will be limited to one or at most a few data batches (see below for details), while a large \bs{} exposes $P$ to a higher risk of fraud.
+Setting \bs{} correctly for each transaction is critical to achieve a sustainable marketplace, because checkpoints are smart contract transactions and as such, in blockchain models like Ethereum, they each incur a fee. There is therefore a trade-off between the risk of losing data and the cost of engaging in a long-running transaction with many checkpoints along the way.
+In our experimental evaluation (Sec.~\ref{sec:evaluation}) we explore this trade-off in detail.
 
+The max loss of data from $P$ depends by the time required for each receipt smart contract transaction to be confirmed on the blockchain.
+When using the simple protocol just defined, $C$, $P$ and \smartc{} interact throughout the data exchange period \ti{} as illustrated i Fig.~\ref{fig:batching}.
+As we can see in the figure, when no fraud occurs $C$ issues a receipt transaction to \smartc{} every \bs{} messages, confirming the number of messages received with the last batch. 
+The time required for this transaction to be confirmed on the blockchain is a random variable whose distribution depends on the network load and the unit gas price chosen to enable the smart contract (in the case of Ethereum). 
+Let \rtEst{} denote the expected value for this distribution, that is, the expected transaction confirmation time.
+Since $P$ cannot assume that the receipt has been issued until it is confirmed, and data streaming continues during this time, $P$ uses \rtEst{} as a timeout to prevent unbounded losses.
+It starts its timer at the end of each batch, and if no message is received from \smartc{} after \rtEst{} has elapsed, it terminates the contract (the broker terminates $C$'s subscription).
+
+\anote{Shaimaa what follows is based on the continuous model and my understanding of it. if you disagree then you will have ti write this  (but rewrite what you have in the paper in any case)}
+
+
+\anote{PM TBC}
+
+Let $\alpha = \frac{\rtEst}{\bs}$ and ...
+
+
+
+\subsection{Cost analysis}  \label{sec:cost}
+
+\anote{figure \ref{fig:batching} must be redone. it is not clear and in the text you must explain what is going on}
+
+\begin{figure}
+	\caption{Data receipt protocol Interactions between $C$, $P$ and \smartc{}}
+	\label{fig:batching}
+	\includegraphics[scale=0.25]{Dis}
+	\centering
+\end{figure}
+
+\anote{Shaimaa:  setting \bs{} = Rate x reputation makes no sense to me because \bs{} is expressed as number of messages (in the batch), while Rate is messages/time. 
+	something is not right here...  PLEASE CHECK}
+
+\anote{\bs{} is a fraction of \etm{} and it is amplified by reputation score. how can it be a messages/time?  you must be missing a time multiplier}
+
+%a simple function of $P$'s reputation score awill set \bs{} to a value that is determined by how much $C$ can be trusted. 
 
 
 \anote{EDITED  ABOVE -- ORIGINAL BELOW -- PM}
 
 
 
-\subsection{Data Batching}
-With the absence of central trust, our approach is a receipt-based model. A consumer is required to send a receipt for every data he received, for this, the real-time stream has to be divided into batches.
-
-A data batch is a group of real-time IoT data which is divided into batches in order to has a checking point after each batch. The checking point checks if the batch has been delivered to a consumer. After each batch has been sent, a consumer has to send a receipt to what he received from the previous batch to the smart contract. An acknowledgment will be sent from the smart contract telling the producer that the data which are sent has been delivered then the producer resume sending the next batch. Once a trade agreement expires, a producer stop streaming the data and a consumer has to send a last receipt to settle the trade.
-
-A receipt is a receipt object sent by a consumer to the smart contract. It reports the number of messages delivered by a consumer for batch received.
+%\subsection{Data Batching}
+%With the absence of central trust, our approach is a receipt-based model. A consumer is required to send a receipt for every data he received, for this, the real-time stream has to be divided into batches.
+%
+%A data batch is a group of real-time IoT data which is divided into batches in order to has a checking point after each batch. The checking point checks if the batch has been delivered to a consumer. After each batch has been sent, a consumer has to send a receipt to what he received from the previous batch to the smart contract. An acknowledgment will be sent from the smart contract telling the producer that the data which are sent has been delivered then the producer resume sending the next batch. Once a trade agreement expires, a producer stop streaming the data and a consumer has to send a last receipt to settle the trade.
+%
+%A receipt is a receipt object sent by a consumer to the smart contract. It reports the number of messages delivered by a consumer for batch received.
 
 
 % While every receipt sent by a consumer needs some gas in order to interact with the smart contract, the less receipts sent means the less gas consumed in smart contract invocation. It is worth to note that specifying the size of the batch is auto-calculated based on a consumer reputation in the marketplace. In other words, a consumer who has high reputation, has large amount of data in a batch which leads to less checking point and therefore less smart contract invocation. 
 
-The batch size is a linear function of a consumer reputation in the marketplace multiplied by a message rate $Rate$. If a consumer reputation is zero, then the producer has the ability to set the batch size and then it will be added to the TA before the trade start. It has to mention that in case of dishonest consumer, a producer will lose at maximum one batch size, section (\ref{ParLoss}).
 
-\begin{lstlisting}[basicstyle=\smaller, frame=single]
-ETM = TATI * Rate      
+\mycomment{The batch size is a linear function of a consumer reputation in the marketplace multiplied by a message rate $Rate$} {there is a problem here BS cannot be a rate}.
+	
+	\mycomment{It has to mention that in case of dishonest consumer, a producer will lose at maximum one batch size,}{this is true only if the producer can suspend data delivery and then continue. But i think this is not a viable model.}
+%
+%\begin{lstlisting}[basicstyle=\smaller, frame=single]
+%ETM = TATI * Rate      
+%
+%# ETM: Estimated Total Messages in a Trade 
+%# TATI: TA Time Interval
+% 
+%if C_rep =0 Then:
+%    A producer has to set the BS manually.
+%else:
+%    BS = Rate * C_rep
+%
+%\end{lstlisting}
 
-# ETM: Estimated Total Messages in a Trade 
-# TATI: TA Time Interval
- 
-if C_rep =0 Then:
-    A producer has to set the BS manually.
-else:
-    BS = Rate * C_rep
-
-\end{lstlisting}
-
-It is worth to note that the data stream is a time sensitive which means it will lose its value once it is divided into batches. The time taken between two batches (RT) as shown in figure \ref{Stream} could be a waste time for a consumer to wait for the receipt to be processed. Because of the batch size function is a linear, a consumer with a high reputation score would use most of the contract time to receive data. An honest consumer has batch size larger than dishonest consumer which means less time consumed in receipts processing and therefore more real-time data received. It is a direct proportional between consumer reputation and using the value of the real-time data stream. 
+%It is worth to note that the data stream is a time sensitive which means it will lose its value once it is divided into batches. The time taken between two batches (RT) as shown in figure \ref{Stream} could be a waste time for a consumer to wait for the receipt to be processed. Because of the batch size function is a linear, a consumer with a high reputation score would use most of the contract time to receive data. An honest consumer has batch size larger than dishonest consumer which means less time consumed in receipts processing and therefore more real-time data received. It is a direct proportional between consumer reputation and using the value of the real-time data stream. 
 
 %  While producers generate a real-time data stream which has to be delivered continuously and on the time of its generation or otherwise it will lose its value, some data is tolerant to be interrupted. Because of the needs of the checking point in our model to process batches receipts sent by a consumer, both streams type have to be divided into batches and checking point for receipts will be after each batch. 
 
@@ -352,12 +386,6 @@ It is worth to note that the data stream is a time sensitive which means it will
 %     \label{ConDisStreams}%
 % \end{figure}
 
-\begin{figure}
-  \caption{Data Stream}
-  \label{Stream}
-  \includegraphics[scale=0.25]{Dis}
-  \centering
-\end{figure}
 
 \subsection{Last Data Package}
 As agreed in the TA, the data stream will be stopped once the subscription expires. Therefore, if there was a batch has been starting and has not been completed yet, the data provider has to stop streaming the data and the consumer must send a receipt for data portion he received, lets call it (Last Data Package in the trade LP) as shown in figure \ref{Stream}. A processing time for the receipt (LPRT) will be out of TATI which means the smart contract will wait LPRT time to receive the last receipt and then  add it to the total receipts have to make the settlement. It is expected by the smart contract to receive a receipt for the LP within a period of time $LPRT $where $LPRT = RT$.
