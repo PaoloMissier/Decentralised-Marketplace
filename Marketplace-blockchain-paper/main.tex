@@ -36,6 +36,8 @@
 \usepackage{soul} % for highlighting text
 \usepackage{relsize} % used in the \anote and \comment macros.
 \usepackage{subfig} % used to put figure side by side
+\usepackage{mathtools}
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
 
 \newcommand{\quotes}[1]{``#1''} 
 \makeatletter
@@ -49,7 +51,7 @@
 
 \newcommand{\anote}[1]{{\leavevmode\smaller\itshape\color{red}\{#1\}}}
 
-\newcommand{\ep}{\ensuremath{\mathit{EP}}}
+\newcommand{\topic}{\ensuremath{\mathit{T}}}
 \newcommand{\bs}{\ensuremath{\mathit{BS}}}
 \newcommand{\ti}{\ensuremath{\mathit{TI}}}
 \newcommand{\mr}{\ensuremath{\mathit{MR}}}
@@ -58,9 +60,17 @@
 \newcommand{\tati}{\ensuremath{\mathit{TATI}}}
 \newcommand{\etm}{\ensuremath{\mathit{ETM}}}
 \newcommand{\tp}{\ensuremath{\mathit{TP}}}
+\newcommand{\bn}{\ensuremath{\mathit{BN}}}
 \newcommand{\smartc}{\ensuremath{\mathit{SC}}}
+\newcommand{\rt}{\ensuremath{\mathit{RT}}}
+\newcommand{\bt}{\ensuremath{\mathit{BT}}}
 \newcommand{\rtEst}{\ensuremath{\widehat{\mathit{RT}}}}
 
+\newcommand{\crep}{\ensuremath{C_{\mathit{rep}} }}
+
+\newcommand{\gt}{\ensuremath{\mathit{GT}}}
+\newcommand{\rc}{\ensuremath{\mathit{RC}}}   % receipt cost
+\newcommand{\gup}{\ensuremath{\mathit{GUP}}}
 %
 % The following packages can be found on http:\\www.ctan.org
 \usepackage{graphics} % for pdf, bitmapped graphics files
@@ -207,14 +217,18 @@ unlike the IOTA project \cite{20}, there is no need to record all IoT data in th
 
 \section{Marketplace Model} \label{sec:MKModel}
 
-We assume, as in standard IoT data streaming, that the exchange of streaming data may be mediated by some transaction-agnostic broker infrastructure, such as the one shown in Fig.~\ref{fig:brokered-data-exchange}.
-The goal of the marketplace is to enable trading of such streaming data between any pair of  participants, i.e., a data Provider  $P$ and a Consumer $C$, while offering guarantees, i.e., 
+We assume, following standard IoT data streaming practices, that the exchange of streaming data between any pair of  participants, i.e., a data Provider  $P$ and a Consumer $C$, is typically mediated by some transaction-agnostic broker infrastructure, such as the one shown in Fig.~\ref{fig:brokered-data-exchange}.
+In this data transfer model, the stream is broken down into discrete message batches. Providers tag their messages with \textit{topics} that uniquely identify that Provider's stream. 
+A Consumer is allowed subscribe to a topic subject to the conditions set in a Trade Agreement, as described below.
+
+The goal of the marketplace is to enable trading of such streaming data while offering guarantees, i.e., 
 regarding the max  loss incurred by either of them in case of adversarial behaviour, as well as to resolve disputes about the amount of data exchanged.
-
+%
 To achieve this, we augment the data exchange with the exchange of \textit{data receipts} between $C$ and $P$, which occurs at regular intervals and throughout the duration of the data stream. Such receipts are exchanged as part of transactions that are mediated by a smart contract, denoted \smartc, on the blockchain. 
-The length of the exchange interval, denoted as Batch Size or \bs, is set at the time of trading agreement negotiation and is designed to let providers $P$ control the level of risk they are prepared to tolerate given limited trust in $C$.
+The length of the exchange interval, denoted as Batch Size or \bs, is set at the time of trading agreement negotiation. 
+As we will see, this parameter enables  $P$ to control the level of risk they are prepared to tolerate given limited trust in $C$.
 
-The model described in this section consists of the following elements:
+The model consists of the following elements:
 \begin{enumerate}
 	
 	\item The description of data offered by a Producer;
@@ -235,14 +249,8 @@ As we will see, the smart contract is responsible for each transaction associate
 \subsection{Data Offering}
 
 The first function of the smart contract is to let data Providers publish their data offerings on the blockchain, where they can be then discovered by prospective Consumers. 
-Concretely, a data stream consists of an unbound sequence of messages, and a data offering specifies an endpoint \ep where data can be obtained. Consistent with the message-based view of streams, in our experimental testbed endpoints are \textit{topics} associated to standard MQTT  IoT data brokers. A topic advertised by a Provider uniquely identifies that Provider's stream. A Consumer is allowed subscribe to a topic subject to the conditions set in the Trade Agreement (described next).
-
-\anote{SHAIMAA please check that this makes sense -- you say nothing about how the data is actually exchanged! i am not sure that referring to the centralised case in sec 1 is appropriate here??}
-
-A data offering $\doff = \langle \ep, \ti, \mr, \up \rangle$ includes, in addition to the endpoint \ep, a specification of (i) The time interval \ti{} during which the offer is valid, (ii) the streaming message rate \mr, eg. in messages/second, (iii) the unit cost \up{} of messages in the stream.
-
-\anote{I have omitted the min reputation here as I think it is confusing at this stage. Introduced later instead.}
-
+As mentioned earlier, a data stream consists of a sequence of messages uniquely identified by  a provider's topic, and a data offering describes the type of stream and specifies how to subscribe to the stream.
+Specifically, a data offering $\doff = \langle \topic, \ti, \mr, \up \rangle$ includes, in addition to the topic \topic, a specification of (i) the time interval \ti{} during which the offer is valid, (ii) the expected streaming message rate \mr, eg. in messages/time, (iii) the unit cost \up{} of each message in the stream.
 
 %
 %
@@ -259,7 +267,9 @@ A data offering $\doff = \langle \ep, \ti, \mr, \up \rangle$ includes, in additi
 
 The trade agreement is a legally binding contract (we use the term ``agreement'' to avoid confusion with smart contracts) between a producer and a consumer, which defines the terms of the data exchange.
 An agreement comes into force when (i) it is signed by both parties using their blockchain account keys (Ethereum in our implementation), and (ii) a smart contract transaction containing the agreement is committed to the blockchain, at which point it can no longer be amended.
-The agreement contains (i) details of a specific data offering \doff, the time interval \tati{} during which the agreement is in force, the total number of messages \etm{} that are expected to be delivered during the time interval, and the total price \tp, which is simply based on the unit price \up{} and the interval.
+The agreement contains (i) a specific data offering \doff{} and (ii) a time interval $\tati$, contained within the time interval \ti, during which the agreement is in force.
+For instance, $C$ may want to subscribe to a portion of an event that is offered over a long period of time.
+For convenience we denote the total price as $\tp = \up \cdot \tati$ and the total number of messages in the agreement as $\etm = \mr \cdot \tati$.
 
 %
 %
@@ -268,43 +278,64 @@ The agreement contains (i) details of a specific data offering \doff, the time i
 
 \subsection{Data Receipt protocol}  \label{sec:protocol}
 
-Once the trade agreement is in force, Consumer $C$ is allowed to subscribe to Provider $P$'s stream.
+Once the trade agreement is in force,  $C$ is allowed to subscribe to $P$'s stream.
 When both parties comply with the agreement and data transfer takes place as expected, at the end of the \tati{} interval $C$ informs the smart contract \smartc{} that the agreement has been fulfilled, and \smartc{} proceeds to settle the payment as per the agreement.
 Suppose however that $C$ fails to inform \smartc. This may happen because $C$ actually failed to receive some of the data in the stream, or because it fraudolently \textit{claims} not to have received the data.
-In our marketplace, we assume that \smartc{} is unable to distinguish between these two events, i.e., there is no requirement for the data broker to keep a (verifiably truthful) log of its message delivery.
+In our model we assume that \smartc{} is unable to distinguish between these two events, because there is no requirement for the data broker to keep a (verifiably truthful) log of its message delivery.
 In this situation, the only possible course of action for \smartc{} is to believe $C$'s claim, and to withhold $P$'s payment as a consequence.
 Thus, assuming minimal accountability on the broker and no trust amongst participants, $P$ may become the victim of $C$'s fraud.
 
 Our approach to mitigate this possibility is to introduce checkpoints throughout the duration of data delivery. 
-The distance between two checkpoints is defined by the batch size \bs, introduced earlier. 
-According to this protocol, at each checkpoint $C$ is expected to send a \textit{data receipt} to \smartc{} as part of a blockchain transaction, which acknowledges receipt of one batch of data from $P$.
-When this happens, \smartc{} records the receipt and then informs $P$. 
-If $P$ does not receive a message from \smartc, it eventually times out and stops the stream (in practice, $C$'s subscription to the stream is cancelled), effectively terminating the trade agreement.
+The number of messages between two checkpoints is the batch size \bs. 
+At each checkpoint $C$ is expected to send a \textit{data receipt} to \smartc{} as part of a blockchain transaction, which acknowledges receipt of one batch of data from $P$.
+When this happens, \smartc{} records the receipt and then informs $P$ acknowledging that the transaction has been confirmed.
+At the same time, at the end of each batch $P$ suspends its streaming to $C$ until it receives the acknowledgment from \smartc.
+If $P$ does not receive a message within a certain time limit, it times out and terminates the trade agreement (in practice, $C$'s subscription to the stream is cancelled).
+Thus, the data exchange protocol and data receipt protocols are interconnected as shown in Fig.~\ref{fig:batching}.
+It is straightforward to see that $P$'s max data loss is simply one batch  of messages.
 
+Thus,  $P$ controls the the max loss of data and thus its risk by setting the value of \bs.
+A small value ensures that data loss will be limited to a few data batches (see below for details), while a large \bs{} exposes $P$ to a higher risk of fraud.
 
-This mechanism provides an upper bound to the loss of data incurred by $P$ in case of fraud, which is a function of \bs, as that determines the distance between two checkpoints (by ``loss of data'' here we mean, $P$ providing streaming messages to $C$ without getting paid for them).
-By setting \bs{} to a small value, data loss will be limited to one or at most a few data batches (see below for details), while a large \bs{} exposes $P$ to a higher risk of fraud.
-Setting \bs{} correctly for each transaction is critical to achieve a sustainable marketplace, because checkpoints are smart contract transactions and as such, in blockchain models like Ethereum, they each incur a fee. There is therefore a trade-off between the risk of losing data and the cost of engaging in a long-running transaction with many checkpoints along the way.
-In our experimental evaluation (Sec.~\ref{sec:evaluation}) we explore this trade-off in detail.
+%The max loss of data from $P$ depends by the time required for each receipt smart contract transaction to be confirmed on the blockchain.
+%When using the simple protocol just defined, $C$, $P$ and \smartc{} interact throughout the data exchange period \ti{} as illustrated i Fig.~\ref{fig:batching}.
+%As we can see in the figure, when no fraud occurs $C$ issues a receipt transaction to \smartc{} every \bs{} messages, confirming the number of messages received with the last batch. 
+%The time required for this transaction to be confirmed on the blockchain is a random variable whose distribution depends on the network load and the unit gas price chosen to enable the smart contract (in the case of Ethereum). 
+%Let \rtEst{} denote the expected value for this distribution, that is, the expected transaction confirmation time.
+%Since $P$ cannot assume that the receipt has been issued until it is confirmed, and data streaming continues during this time, $P$ uses \rtEst{} as a timeout to prevent unbounded losses.
+%It starts its timer at the end of each batch, and if no message is received from \smartc{} after \rtEst{} has elapsed, it terminates the contract (the broker terminates $C$'s subscription).
 
-The max loss of data from $P$ depends by the time required for each receipt smart contract transaction to be confirmed on the blockchain.
-When using the simple protocol just defined, $C$, $P$ and \smartc{} interact throughout the data exchange period \ti{} as illustrated i Fig.~\ref{fig:batching}.
-As we can see in the figure, when no fraud occurs $C$ issues a receipt transaction to \smartc{} every \bs{} messages, confirming the number of messages received with the last batch. 
-The time required for this transaction to be confirmed on the blockchain is a random variable whose distribution depends on the network load and the unit gas price chosen to enable the smart contract (in the case of Ethereum). 
-Let \rtEst{} denote the expected value for this distribution, that is, the expected transaction confirmation time.
-Since $P$ cannot assume that the receipt has been issued until it is confirmed, and data streaming continues during this time, $P$ uses \rtEst{} as a timeout to prevent unbounded losses.
-It starts its timer at the end of each batch, and if no message is received from \smartc{} after \rtEst{} has elapsed, it terminates the contract (the broker terminates $C$'s subscription).
+\subsection{Cost of agreements}  \label{sec:cost}
 
-\anote{Shaimaa what follows is based on the continuous model and my understanding of it. if you disagree then you will have ti write this  (but rewrite what you have in the paper in any case)}
+Setting \bs{} correctly for each transaction is critical to achieving a sustainable marketplace, because checkpoints are smart contract transactions and as such, in blockchain models like Ethereum, they each incur a fee. There is therefore a trade-off between the risk of losing data and the cost of engaging in a long-running transaction with many checkpoints along the way.
+To make this observation precise, let us calculate the total cost of purchasing a data stream from a provider, as a function of the tunable parameter \bs.
 
+Firstly, in order to participate in the marketplace each participant, in either a consumer or producer role, must register itself with the network. 
+This incurs a one-off \textit{registration cost} to execute the smart contract user registration function.
 
-\anote{PM TBC}
+Secondly, the deployment of a trade offer to the network is also implemented as a smart contract function, which again incurs a fee. This is a provider-only cost.
 
-Let $\alpha = \frac{\rtEst}{\bs}$ and ...
+Thirdly, a smart contract fee is paid when a new trade agreement is recorded on the blockchain. This cost is split between $P$ and $C$.
+%
 
+While these are all one-off costs and can be regarded as constant, the receipt protocol generates one transaction for each batch, for a total of 
+\[\bn = \ceil[\bigg] {\frac{\etm}{\bs}} \]
+transactions (the ceiling accounts for fractional batches at the end of the \tati{} period). 
+Assuming the Ethereum cost model with gas unit price \gup{} and gas consumption per transaction \gt, the total cost \rc{} due to the receipt transactions is 
+\[\rc = \bn \cdot  \gt \cdot \gup    \]
 
+\mynote{Shaimaa:  the equation $\bn=\frac{\tati}{\bt+\rt}$ assumes that \tati{} includes all the \rt{} intervals, but I think in our latest discussion we have decided this is not the case -- think of \tati{} as the duration of a game, that should not include the ``advert'' time \rt{}. instead \bn{} is defined simply as above, which means that if $\bs=C_{rep} \cdot \etm$, then the cost \bn{} reduces simply to $1/C_{rep}$.
+}
 
-\subsection{Cost analysis}  \label{sec:cost}
+This cost is inversely proportional to \bs{}. In our experiments we have assumed $\bs= f(\crep) \cdot \etm$ where   $f(\crep{}) \leq 1$ is a function of $C$'s current reputation score, \crep.
+In this case, \bn{} simplifies to $\bn =  1/f(\crep{})$.
+Function $f(.)$ is a parameter in the model and can be chosen to either amplify or reduce the effect of reputation. In our experiment we use a linear function with \mynote{can you complete this?  I know you have used $\crep \cdot \mr$ but as discussed, this looks incorrect}
+The total cost to $C$, $C_{cost}$
+
+By enabling $P$ to control \bs, the risk that the provider is willing to incur, in terms of data loss, 
+
+The cost of accounts for 
+Let us now  
 
 \anote{figure \ref{fig:batching} must be redone. it is not clear and in the text you must explain what is going on}
 
@@ -337,11 +368,11 @@ Let $\alpha = \frac{\rtEst}{\bs}$ and ...
 
 % While every receipt sent by a consumer needs some gas in order to interact with the smart contract, the less receipts sent means the less gas consumed in smart contract invocation. It is worth to note that specifying the size of the batch is auto-calculated based on a consumer reputation in the marketplace. In other words, a consumer who has high reputation, has large amount of data in a batch which leads to less checking point and therefore less smart contract invocation. 
 
-
-\mycomment{The batch size is a linear function of a consumer reputation in the marketplace multiplied by a message rate $Rate$} {there is a problem here BS cannot be a rate}.
-	
-	\mycomment{It has to mention that in case of dishonest consumer, a producer will lose at maximum one batch size,}{this is true only if the producer can suspend data delivery and then continue. But i think this is not a viable model.}
 %
+%\mycomment{The batch size is a linear function of a consumer reputation in the marketplace multiplied by a message rate $Rate$} {there is a problem here BS cannot be a rate}.
+%	
+%	\mycomment{It has to mention that in case of dishonest consumer, a producer will lose at maximum one batch size,}{this is true only if the producer can suspend data delivery and then continue. But i think this is not a viable model.}
+%%
 %\begin{lstlisting}[basicstyle=\smaller, frame=single]
 %ETM = TATI * Rate      
 %
@@ -386,158 +417,159 @@ Let $\alpha = \frac{\rtEst}{\bs}$ and ...
 %     \label{ConDisStreams}%
 % \end{figure}
 
+\anote{I think this is all we need for this section. much simplified because behind the many equation the storyr is actually very simple, so I commented out the original text--- but please look at the comments.}
+%
+%\subsection{Last Data Package}
+%As agreed in the TA, the data stream will be stopped once the subscription expires. Therefore, if there was a batch has been starting and has not been completed yet, the data provider has to stop streaming the data and the consumer must send a receipt for data portion he received, lets call it (Last Data Package in the trade LP) as shown in figure \ref{Stream}. A processing time for the receipt (LPRT) will be out of TATI which means the smart contract will wait LPRT time to receive the last receipt and then  add it to the total receipts have to make the settlement. It is expected by the smart contract to receive a receipt for the LP within a period of time $LPRT $where $LPRT = RT$.
 
-\subsection{Last Data Package}
-As agreed in the TA, the data stream will be stopped once the subscription expires. Therefore, if there was a batch has been starting and has not been completed yet, the data provider has to stop streaming the data and the consumer must send a receipt for data portion he received, lets call it (Last Data Package in the trade LP) as shown in figure \ref{Stream}. A processing time for the receipt (LPRT) will be out of TATI which means the smart contract will wait LPRT time to receive the last receipt and then  add it to the total receipts have to make the settlement. It is expected by the smart contract to receive a receipt for the LP within a period of time $LPRT $where $LPRT = RT$.
+%\subsection{Participants' loss} \label{ParLoss}
+%In the marketplace protocol, and based on the assumption that the data providers are honest while they have no incentives not to sell their data in the marketplace, they have to take a risk when decide to involve in new trades in this marketplace. A producer could reduce his risk and loss by set a minimum reputation for candidate consumers when he pushes an offer in the blockchain, and also can updates the values anytime based on the current market state. 
+%
+%\mynote{It should mention that a consumer might cheat and does not send a receipt to what he received, and therefore the data owner (producer) will loses the unreported data and the consumer will be rated with low reputation score based on the proposed reputation model of this marketplace.}
+%
+%A consumer should send a receipt within RT while the producer waiting for the acknowledgment to resume sending the next data batch. If the consumer does not send the receipt or does not report the correct amount of data delivered, the trades stops immediately and a producer can only lose the price of at maximum one full batch as the following where Max and $ P_{Loss} $ are Maximum Data Loss and Producer Loss, respectively:
+%\vspace{-0.1 cm}
+%\mathleft
+%\begin{align}
+%\textbf{a) } & Max = BS \nonumber\\
+%\textbf{b) }  & 0 <= P_{Loss} <= ( Max \times UP )\nonumber
+%% \textbf{c) }  & Max_CLoss = Max_DLoss \times Price \times Price 
+%% \nonumber\\
+%% \textbf{d) }  &  >= P_CLoss <= Max_CLoss \nonumber
+%\end{align}
 
-\subsection{Participants' loss} \label{ParLoss}
-In the marketplace protocol, and based on the assumption that the data providers are honest while they have no incentives not to sell their data in the marketplace, they have to take a risk when decide to involve in new trades in this marketplace. A producer could reduce his risk and loss by set a minimum reputation for candidate consumers when he pushes an offer in the blockchain, and also can updates the values anytime based on the current market state. 
+%\subsection{Settlement Process}
+%
+%The settlement process is the task of fulfillment the financial contractual obligations of a trade.
+%At the end of each trade, the price of the total data delivered (AP) should be taken out from the consumer deposit and transferred to the producer account,  and the rest (if any) will be returned back to a consumer account. When a consumer interact with the smart contract to create a new TA, he deposits tokens for the expected total data price (TP) could to be delivered during the TATI. The expected total data  ETM  and AP are calculated as the following:
+%
+%\vspace{-0.2 cm}
+%\mathleft
+%\begin{equation}
+%\textbf {$ETM = TATI \times Rate. $}    
+%\end{equation}
+% 
+%\vspace{-0.5 cm}
+%% OR \mynote{$ETM = TATI//BS \times Rate$} This exclude the LP ( does not work )
+%
+%\mathleft
+%\begin{equation}
+%\textbf {$TP = ETM \times UP $} 
+%\end{equation}
+%
+%\vspace{-0.5 cm}
+%
+%\mathleft
+%\begin{equation}
+%\textbf {$AP = UP \times \big(BS \times BN + LP\big)$} 
+%\end{equation}
+%
 
-\mynote{It should mention that a consumer might cheat and does not send a receipt to what he received, and therefore the data owner (producer) will loses the unreported data and the consumer will be rated with low reputation score based on the proposed reputation model of this marketplace.}
+%where UP, BS, BN and LP is the price per message unit, the batch size, the batch number and last package data, respectively and $ AP \subset TP$.
+%
+%Each trade parties in the marketplace costs some tokens for trading. Firstly, everyone in the marketplace has to register in the network by invoking registration method in the smart contract. This cost will be deducted once from their balances and it is called a \textit{registration cost}. \textit{ An offering cost} is the cost deducted from a producer account in order to deploy his offer to the network. He invokes the offer method from the smart contract with his offer details as a transaction payload. \textit{ A set up cost} is deducted for each trade between a producer and a consumer which include all expenses of making an order and creating a new TA from consumer side, and do the data batching and approve the created TA from the producer side. \textit{An Authentication cost} is the cost paid for sending a receipt for every data batch received by a consumer. This cost will be deducted only from consumer balance for sending receipts. This cost will be paid  as receipts cost as the same as the number of batches delivered plus the last package (if any) by a consumer in a trade. Producer and consumer balances will be as follows for trade $T_{i}$ and $offer_{i}$:
+%
+%\vspace{-0.3 cm}
+%
+%\mathleft
+%\begin{equation}
+%\textbf{$P_{balance} -= ( Offering Cost_{i} + Setup Cost_{i} )$} 
+%\end{equation}
+%
+%\vspace{-0.5 cm}
+%
+%\mathleft
+%\begin{equation}
+% \textbf{$C_{balance} -= ( C_{cost_{i}} + AP{i} )$}   
+%\end{equation}
+%
+%\vspace{-0.5 cm}
+%
+%\mathleft
+%\begin{equation}
+%\textbf{$ C_{cost_{i}} = Setup Cost_{i} + Authentication Cost_{i} $} \label{C_costEq}     
+%\end{equation}
+%
+%
+%
+%Note: $ Registration Cost$ is excluded because we assumed it was taken once from their balances in their first interaction in the marketplace. 
+%
+%We will use the following as abbreviation; Gas Used for Registration as GUR, Gas Used for Setup as GUS, Gas Used for Authentication for sending the receipt as GUA, Gas Price by Gwei as GP, Receipt number in a trade as RN, batch number as BN, Last data package LP, Batch sending time as BT, receipt processing time as RT, and time between two batches as B2B.
+%
+%\vspace{-0.5 cm}
+%
+%\mathleft
+%\begin{equation}
+%\textbf{$ Registration Cost = GUR \times GP$ }   
+%\end{equation}
+%
+%\vspace{-0.5 cm}
+%
+%\mathleft
+%\begin{equation}
+%\textbf{$ Setup Cost_{i} = GUS_{i} \times GP_{i} $}    
+%\end{equation}
+%
+%\vspace{-0.5 cm}
+%
+%\mathleft
+%\begin{equation}
+%\textbf{$ Authentication Cost_{i} =  RN_{i} \times GUA_{i} \times GP_{i} $}    
+%\end{equation}
+%
+%\vspace{-0.5 cm}
+%
+%\mathleft
+%\begin{equation}
+%\textbf{$ RN _{i} = BN _{i} + LPN _{i} $}   
+%\end{equation}
+%
+%\vspace{-0.5 cm}
+%
+%\mathleft
+%\begin{equation}
+%\textbf{$ LP _{i} = TATI _{i}  \%  B2B _{i} $}   
+%\end{equation}
+%
+%\vspace{-0.5 cm}
+%
+%\mathleft
+%\begin{equation}
+%BN _{i} = \frac{TATI _{i}}{B2B _{i}}
+%\end{equation}
+%
+%\vspace{-0.5 cm}
+%
+%\mathleft
+%\begin{equation}
+%\textbf{$ B2B _{i} = BT _{i} + RT _{i}$}    
+%\end{equation}
+%
+%\vspace{-0.5 cm}
+%
+%\mathleft
+%\begin{equation}
+%BT _{i} = \frac{BS _{i}}{Rate _{i} } 
+%\end{equation}
+%
+%\vspace{-0.5 cm}
+%
+%\mathleft
+%\begin{equation}
+%\textbf{$ BS _{i} = C_{Rep} \times Rate $}    
+%\end{equation}
+%
+%\vspace{0.5 cm}
+%
+%From all the above equations, we could rewrite formula (\ref{C_costEq}) as follows:
+%
+%% \mathcenter 
+%\begin{equation} \label{FCostEq}
+%\boldmath C_{cost} = \bigg\{ \big[ \frac{TATI}{C_{Rep}+RT} + LP\big] \times GUA + GUS \bigg\}\times GP
+%\end{equation}
 
-A consumer should send a receipt within RT while the producer waiting for the acknowledgment to resume sending the next data batch. If the consumer does not send the receipt or does not report the correct amount of data delivered, the trades stops immediately and a producer can only lose the price of at maximum one full batch as the following where Max and $ P_{Loss} $ are Maximum Data Loss and Producer Loss, respectively:
-\vspace{-0.1 cm}
-\mathleft
-\begin{align}
-\textbf{a) } & Max = BS \nonumber\\
-\textbf{b) }  & 0 <= P_{Loss} <= ( Max \times UP )\nonumber
-% \textbf{c) }  & Max_CLoss = Max_DLoss \times Price \times Price 
-% \nonumber\\
-% \textbf{d) }  &  >= P_CLoss <= Max_CLoss \nonumber
-\end{align}
-
-\subsection{Settlement Process}
-
-The settlement process is the task of fulfillment the financial contractual obligations of a trade.
-At the end of each trade, the price of the total data delivered (AP) should be taken out from the consumer deposit and transferred to the producer account,  and the rest (if any) will be returned back to a consumer account. When a consumer interact with the smart contract to create a new TA, he deposits tokens for the expected total data price (TP) could to be delivered during the TATI. The expected total data  ETM  and AP are calculated as the following:
-
-\vspace{-0.2 cm}
-\mathleft
-\begin{equation}
-\textbf {$ETM = TATI \times Rate. $}    
-\end{equation}
- 
-\vspace{-0.5 cm}
-% OR \mynote{$ETM = TATI//BS \times Rate$} This exclude the LP ( does not work )
-
-\mathleft
-\begin{equation}
-\textbf {$TP = ETM \times UP $} 
-\end{equation}
-
-\vspace{-0.5 cm}
-
-\mathleft
-\begin{equation}
-\textbf {$AP = UP \times \big(BS \times BN + LP\big)$} 
-\end{equation}
-
-
-where UP, BS, BN and LP is the price per message unit, the batch size, the batch number and last package data, respectively and $ AP \subset TP$.
-
-Each trade parties in the marketplace costs some tokens for trading. Firstly, everyone in the marketplace has to register in the network by invoking registration method in the smart contract. This cost will be deducted once from their balances and it is called a \textit{registration cost}. \textit{ An offering cost} is the cost deducted from a producer account in order to deploy his offer to the network. He invokes the offer method from the smart contract with his offer details as a transaction payload. \textit{ A set up cost} is deducted for each trade between a producer and a consumer which include all expenses of making an order and creating a new TA from consumer side, and do the data batching and approve the created TA from the producer side. \textit{An Authentication cost} is the cost paid for sending a receipt for every data batch received by a consumer. This cost will be deducted only from consumer balance for sending receipts. This cost will be paid  as receipts cost as the same as the number of batches delivered plus the last package (if any) by a consumer in a trade. Producer and consumer balances will be as follows for trade $T_{i}$ and $offer_{i}$:
-
-\vspace{-0.3 cm}
-
-\mathleft
-\begin{equation}
-\textbf{$P_{balance} -= ( Offering Cost_{i} + Setup Cost_{i} )$} 
-\end{equation}
-
-\vspace{-0.5 cm}
-
-\mathleft
-\begin{equation}
- \textbf{$C_{balance} -= ( C_{cost_{i}} + AP{i} )$}   
-\end{equation}
-
-\vspace{-0.5 cm}
-
-\mathleft
-\begin{equation}
-\textbf{$ C_{cost_{i}} = Setup Cost_{i} + Authentication Cost_{i} $} \label{C_costEq}     
-\end{equation}
-
-
-
-Note: $ Registration Cost$ is excluded because we assumed it was taken once from their balances in their first interaction in the marketplace. 
-
-We will use the following as abbreviation; Gas Used for Registration as GUR, Gas Used for Setup as GUS, Gas Used for Authentication for sending the receipt as GUA, Gas Price by Gwei as GP, Receipt number in a trade as RN, batch number as BN, Last data package LP, Batch sending time as BT, receipt processing time as RT, and time between two batches as B2B.
-
-\vspace{-0.5 cm}
-
-\mathleft
-\begin{equation}
-\textbf{$ Registration Cost = GUR \times GP$ }   
-\end{equation}
-
-\vspace{-0.5 cm}
-
-\mathleft
-\begin{equation}
-\textbf{$ Setup Cost_{i} = GUS_{i} \times GP_{i} $}    
-\end{equation}
-
-\vspace{-0.5 cm}
-
-\mathleft
-\begin{equation}
-\textbf{$ Authentication Cost_{i} =  RN_{i} \times GUA_{i} \times GP_{i} $}    
-\end{equation}
-
-\vspace{-0.5 cm}
-
-\mathleft
-\begin{equation}
-\textbf{$ RN _{i} = BN _{i} + LPN _{i} $}   
-\end{equation}
-
-\vspace{-0.5 cm}
-
-\mathleft
-\begin{equation}
-\textbf{$ LP _{i} = TATI _{i}  \%  B2B _{i} $}   
-\end{equation}
-
-\vspace{-0.5 cm}
-
-\mathleft
-\begin{equation}
-BN _{i} = \frac{TATI _{i}}{B2B _{i}}
-\end{equation}
-
-\vspace{-0.5 cm}
-
-\mathleft
-\begin{equation}
-\textbf{$ B2B _{i} = BT _{i} + RT _{i}$}    
-\end{equation}
-
-\vspace{-0.5 cm}
-
-\mathleft
-\begin{equation}
-BT _{i} = \frac{BS _{i}}{Rate _{i} } 
-\end{equation}
-
-\vspace{-0.5 cm}
-
-\mathleft
-\begin{equation}
-\textbf{$ BS _{i} = C_{Rep} \times Rate $}    
-\end{equation}
-
-\vspace{0.5 cm}
-
-From all the above equations, we could rewrite formula (\ref{C_costEq}) as follows:
-
-% \mathcenter 
-\begin{equation} \label{FCostEq}
-\boldmath C_{cost} = \bigg\{ \big[ \frac{TATI}{C_{Rep}+RT} + LP\big] \times GUA + GUS \bigg\}\times GP
-\end{equation}
-
-
-Where $C_{cost}$ is a consumer cost in a trade.
+%
+%Where $C_{cost}$ is a consumer cost in a trade.
 
 \section{System Architecture ans Workflow} \label{Arch}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
