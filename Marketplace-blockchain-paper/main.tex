@@ -330,14 +330,6 @@ Assuming the Ethereum cost model with gas unit price \gup{} and gas consumption 
 This cost is inversely proportional to \bs{}. In our experiments we have assumed $\bs= f(\crep) \cdot \etm$ where   $f(\crep{}) \leq 1$ is a function of $C$'s current reputation score, \crep.
 In this case, \bn{} simplifies to $\bn =  1/f(\crep{})$.
 Function $f(.)$ is a parameter in the model and can be chosen to either amplify or reduce the effect of reputation. In our experiment we use a linear function with \mynote{can you complete this?  I know you have used $\crep \cdot \mr$ but as discussed, this looks incorrect}
-The total cost to $C$, $C_{cost}$
-
-By enabling $P$ to control \bs, the risk that the provider is willing to incur, in terms of data loss, 
-
-The cost of accounts for 
-Let us now  
-
-\anote{figure \ref{fig:batching} must be redone. it is not clear and in the text you must explain what is going on}
 
 \begin{figure}
 	\caption{Data receipt protocol Interactions between $C$, $P$ and \smartc{}}
@@ -346,15 +338,9 @@ Let us now
 	\centering
 \end{figure}
 
-\anote{Shaimaa:  setting \bs{} = Rate x reputation makes no sense to me because \bs{} is expressed as number of messages (in the batch), while Rate is messages/time. 
-	something is not right here...  PLEASE CHECK}
-
-\anote{\bs{} is a fraction of \etm{} and it is amplified by reputation score. how can it be a messages/time?  you must be missing a time multiplier}
-
-%a simple function of $P$'s reputation score awill set \bs{} to a value that is determined by how much $C$ can be trusted. 
 
 
-\anote{EDITED  ABOVE -- ORIGINAL BELOW -- PM}
+%\anote{EDITED  ABOVE -- ORIGINAL BELOW -- PM}
 
 
 
