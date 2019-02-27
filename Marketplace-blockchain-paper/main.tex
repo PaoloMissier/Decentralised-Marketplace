@@ -129,95 +129,79 @@ We experimentally assess such trade-offs on a testbed using Ethereum Smart Contr
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{INTRODUCTION}
+\section{Introduction}  \label{sec:intro}
 
+\anote{TODO: make sure links to sites etc are not part of biblio -- only use biblio for academic references.  put urls inline \url{blah} or as footnotes}
 
-\mynote{need to ACK our IOT paper and relate back to it}
+\anote{TODO: redo figures for legibility and align thenm with text}
 
-
-Data streaming from Internet of Things (IoT) devices are increasingly viewed as assets with value not only to the device owners, but also with resell value, i.e., to third party buyers. 
-New forms of dedicated data marketplaces are emerging to help unlock such value, for instance Misura~\cite{misura}.
-
+Data streams that originate from Internet of Things (IoT) devices are increasingly viewed as tradeable assets with value not only to the device owners, but also with resell value, i.e., to third party buyers. 
+New forms of dedicated data marketplaces are emerging to help unlock such value~\cite{misura}, but these are comparatively less mature than more traditional data marketplaces for static data, cf. eg ~\cite{7004800,Schomm2013} for surveys on these.
 Unlike static data,  IoT data streams tend to lose their value if they are not consumed in near-real time, and data transmission and delivery may be unreliable. 
-On the other hand, data exchange architectures based on message brokers systems such as MQTT allow a single data stream to be delivered to multiple parties. 
-This potentially enables data providers to profit from their data assets on an open marketplace built on top of the brokering infrastructure.
-While the IoT network and message-passing infrastructure can support a scalable marketplace, this inevitably leads to issues of mutual trust amongst participants, especially when they have no prior reputation within the marketplace.
+On the other hand, data exchange architectures based on message brokers systems such as MQTT allow a single data stream to be delivered to multiple parties, potentially enabling large-scale  open marketplaces where data owners may resell their streams in realt-time multiple times.
+While the IoT network and message-passing infrastructure can support a scalable marketplace, this inevitably leads to issues of mutual trust amongst participants, especially when those have no prior reputation within the marketplace. Also, the short-lived nature of streams requires efficient, automated mechanisms to create legally binding trade agreements, including payment arrangements, and to enforce such agreements throughout data transmission.
 
+New generation blockchain technology that supports Smart Contracts is a natural choice to address all of these requirements, as Smart Contracts can act as a trusted intermediary within an untrusted community of marketplace participants, by adding transactionality to each of their interactions: before, during, and after data exchange.
 
-\mynote{ORIGINAL TEXT BELOW}
-
-
-\anote{minor: make sure links to sites etc are not part of biblio -- only use biblio for academic references.  put urls inline \url{blah} or as footnotes}
-
-\anote{
-	-- what problem has not been solved: marketplace with (i) IoT streaming data and (ii) no mutual trust amongst participants. \\
-	-- approach: (i) smart contract act as broker. (ii) mechanisms to reduce risk on both sides in the absence of trust: (ii-a) protocol involving smart contract to record transactions, and (ii-b) reputation model to mitigate risk. The two are connected: the protocol allows data exchange to be tuned in a way that is a function of limited trust, acquired through the reputation model.
-}
-
-
-
-%is increasingly viewed as is a dynamic global network for interconnected devices that can stream that are connecting together by the Internet such as sensors, actuators and Radio-frequency identification (RFIDs) to provide value-added services. Over the last decade, the IoT data has become one of the traceable assets in current ecosystem due to its beneficial aspects for their owners and their buyers. Data marketplaces \anote{for IoT data} have emerged which present a platform for data owners and buyers to negotiate and apply terms that both agreed to trade the needed data 
-
-Currently, there are many projects working as a marketplace for data trading. 
-\mycomment{Some of them}{need references} are showing a shared economy with real-time IoT data which generated from IoT devices in many domains. 
-\mycomment{Many of them}{need references} are offering various datasets to be sold for either individuals, government or industries for the aggregation and analysis purposes. 
-
-These traditional marketplaces has been selling the datasets where the data are not updated or not time sensitive. 
-Unlike the marketplaces for real-time data that are generated from IoT. 
-It is a difficult task to  design marketplaces for IoT data due to its characteristics which make them different from traditional datasets. \cite{misura} has shown unique IoT data features. The undependability of IoT data owner is one of its uniqueness. There are variety of IoT owner who produce data from their owned devices and sell it
- In addition, IoT data are gathered from real-time sensors such as temperature, humidity or car traffic is time sensitive. 
- If these data has not been used at the time of its generation it would loose their value and no longer needed. And because of the IoT data is time sensitive, a data buyer would have a trade agreement to buy data in advance which is a challenging task. Buying data in advance needs a mechanism in the marketplace to decide if the payment would be paid before of after delivering the data. If it is before subscribing the data, that means we require a system to fulfill the trade agreement that data provide and data buyer have, enforce the contract obligations to be done and guarantee delivering data to the consumers.
-
-Currently, it has sown many marketplaces that are tailored to deal with IoT data in either centralized or in decentralized infrastructure. Misura in \cite{misura} has introduced a centralized marketplace as a cloud application based on a queuing system. Each data provider registers their sensors into the application with all details and description of the data. On the other hand, data consumer query the system for their needs and then  they will be advised by the system to the appropriate data provider who provide their needs. 
-
-On the other hand, Datum \cite{24} has introduced a decentralized marketplace based on the emerging technology Blockchain. It is an IoT data marketplace which is designed to trade a stored IoT data based on Ethereum Blockchain network. A data provider achieves the scalability by storing his structural data securely in such BigchainDB and IPFS.  It uses the smart contract and the DAT token to enable the data buyer to get access to these data. 
-
-The vision of our model is to have a decentralized marketplace for real-time IoT data with the use of the distributed ledger (Blockchain). It consists of two layers; data layer for exchanging data in the brokerage platform and Blockchain layer for the negotiation and trades contracts.
-
-The remainder of this paper is organized as follows. Section \ref{CentModel} shows the centralized model. Section \ref{Motivation&Contribution} and \ref{RelatedWork&Background} show the motivation of our model and the related works. Section \ref{MKModel} and section \ref{Arch} show the marketplace model and the system architecture. Section \ref{Impl&Evaluation} shows the implementation and the evaluation of  consumer cost in the marketplace and then it will be ended by the conclusion in section \ref{conclusion}.
-
-\subsection{Centralized Brokered IoT Data Marketplace Architecture} \label{CentModel}
-
-\begin{figure}
-  \caption{Centralized Brokered IoT Data Marketplace Architecture}
-  \label{fig:brokered-data-exchange}
-  \includegraphics[scale=0.4]{Cent}
-%   \centering
-
-\end{figure}
-
-Recent days, sharing the economy with IoT data has increased the demand for establishing IoT data marketplace. In brokered IoT data marketplace scenario as shown in Figure\ref{Cent} , data providers have to push their data through a centralized broker which then data consumers subscribe through predefined topics. A broker has the ability to count the number of messages published by a producer and subscribed by a consumer for all producers and consumers participated in the marketplace, which is dependable as a data source for the settlement process. The settlement process relies on the data metering from the broker and applies the settlement straightforward for both producer and consumer. 
-	
-In the above centralized reward data marketplace model, with the assumption of removing the trust from the broker, it could be a threat to alter or change some of data traffic metering between producers and consumers which would affect on the data authenticity, therefore the settlement process would be unsatisfied. This could be a vital factor in the marketplace sustainability especially with the absence of the trust and the lack of other secondary dependencies could be used to check the missed or altered metering data of the trade.
-The centralized infrastructure, as well as the third party- intermediators for data exchange, is not a centralized trusted component. It has been watched by the researchers that the trust issue has limited sharing data and killed the enthusiasm to be part of unreliable marketplace. While some of the current platforms have strength their model by many security mechanisms such as access control and authentication privacy, they still depend on the third party \cite{12}.
-
-\subsection{Motivation and Paper Contribution} \label{Motivation&Contribution}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-In our previous work\cite{Missier2017} we suggested that the next generation of marketplaces for IoT data  should meet four main requirements;Dynamicity,Access to individuals, Real-time streams as a marketplace assets and decentralization of trust with governance.
-
- The marketplace should be able to flexibly accept new participants (either individuals, institutions or business organizations), be resilient to leaving participants, and accommodate unanticipated business relationships amongst those participants. That means anyone who controls IoT devices and generate IoT data streams should be able to monetize it and use it as a tradeable assets in the marketplace.
- 
-Although the current traditional data marketplaces such as the Microsoft's Azure Data Market \cite{22} cater to batch static data with long ''shelf life'', our focus is on streams whose value is maximal when they are consumed ''live'' (as opposed to being stored and played back on demand).
-
+An example of such approach is Datum~\cite{Haenni2017} (\url{datuk.org}), based on the Ethereum network, which however is designed to let anyone \textit{store} structured data on the blockchain.
+In contrast, we envision a decentralised marketplace for real-time IoT data that is scalable in the number of participants and does not require prior trust amongst them, while at the same time providing simple guarantees regarding data and monetary loss in case of participant's fraud.
+The marketplace should be able to flexibly accept new participants (either individuals, institutions or business organizations), be resilient to leaving participants, and accommodate unanticipated business relationships amongst those participants. That means anyone who controls IoT devices and generate IoT data streams should be able to monetize it and use it as a tradeable assets in the marketplace.
 Additionally, in contrast to existing proposals, e.g.\cite{Cao:2016:MMR:2926746.2883611}, we aim to define a marketplace that does not require a centralized trust component, such as a brokerage platform with trusted ownership, but relies instead on collective verification mechanisms, such as blockchain, to enforce its own governance rules.
 
-In this paper we describe a Blockchain-based marketplace architecture that is designed to fulfill all of these requirements. It is a challenging task to have a public decentralized marketplace dealing with a live stream with no trusted component.
+Our approach involves using Ethereum Smart Contracts to support each phase of the interaction amongst a data provider and a consumer. It separates the data exchange interaction, which occurs on the IoT network  and core cloud network, from transaction-based interactions aimed at enforcing non-repudiability of participant's actions and resolving their disputes, which occurs on the blockchsin network.
+
+\subsection{Contributions} \label{sec:contributions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+This work follows on from, and refines, our earlier proposal for a IoT data marketplace, where we suggested that Ethereum is capable of supporting a fully decentralised marketplace without any assumption of mutual trust~~\cite{Missier2017}.
+The approach suggested in the paper is based on the idea that each participant would periodically report to a Smart Contract on the data sent to and received from other participants, and the Contract would be able to use such reports to settle any disputes.
+
+In contrast, here we begin by proposing a different and much simpler protocol involving data providers, consumers, and a Smart Contract, based on the notion of periodic checkpoints during data exchange, supported by blockchain transactions to ensure limited scope for fraud on either side. 
+
+We then use our own prototype implementation of the  marketplace model on a private Ethereum network, to experimental evaluate the cost/risk trade-offs that are available by setting checkpoint frequency, also taking advantage of \textit{potential} external mechanisms for establishing trust amongst participants, \textit{if they are} available.
+
+
+requirements. It is a challenging task to have a public decentralized marketplace dealing with a live stream with no trusted component.
 
 % In addition, a blockchain is not designed to record too much data, so it has to employ the advantages of the blockchain in the marketplace for trades' obligations fulfillment and data exchange monitoring in the brokerage platform with taking into account the blockchain limitation e.g. scalability.
 
 % The emerging of the decentralized applications has emphasized the lack of reliance on the third party and killed the fact of trusting an individual node.  It shows a wide area for applications with no failure point due to decentralized infrastructure. 
 
- In our decentralized model, the settlement and the trade monitoring is done on the blockchain layer which means that we need a level of trust to accomplish theses trades successfully. The blockchain gives the opportunity to remove the third party that guarantee the trust in the centralized model , and instead distribute the trust and placed elsewhere, namely in public key cryptography and a ''consensus mechanism'' that allows us to determine the truth.
+%  In our decentralized model, the settlement and the trade monitoring is done on the blockchain layer which means that we need a level of trust to accomplish theses trades successfully. The blockchain gives the opportunity to remove the third party that guarantee the trust in the centralized model , and instead distribute the trust and placed elsewhere, namely in public key cryptography and a ''consensus mechanism'' that allows us to determine the truth.
 
-Real-time IoT data has minimal value when they are not used at the same time of its generation, so we need a model dealing immediately with the data. In addition, the blockchain was not emerged to store a huge amount of data and instead, it is created to store limited data immutably. 
+% Real-time IoT data has minimal value when they are not used at the same time of its generation, so we need a model dealing immediately with the data. In addition, the blockchain was not emerged to store a huge amount of data and instead, it is created to store limited data immutably. 
 
-With the core advantage of the second generation of the blockchain – smart contract – we propose each trade must have a digital contract called Trade Agreement TA. Each TA must be signed by both parties and once its obligations are met, it is executed automatically and all trades payments are done in Ethereum token (Ether).
+% With the core advantage of the second generation of the blockchain – smart contract – we propose each trade must have a digital contract called Trade Agreement TA. Each TA must be signed by both parties and once its obligations are met, it is executed automatically and all trades payments are done in Ethereum token (Ether).
 
 % For this, unlike the IOTA project \cite{20}, there is no need to record all IoT data in the chain and only need to store the metadata and the trade details between a producer and a consumer as a trade agreement. With the core advantage of the second generation of the blockchain – smart contract – we propose each trade must have a digital contract called Trade Agreement TA. Each TA must be signed by both parties and once its obligations are met, it is executed automatically and all trades payments are done in Ethereum token (Ether).
 
-\subsection{Background and Related Works} \label{RelatedWork&Background}
+
+%is increasingly viewed as is a dynamic global network for interconnected devices that can stream that are connecting together by the Internet such as sensors, actuators and Radio-frequency identification (RFIDs) to provide value-added services. Over the last decade, the IoT data has become one of the traceable assets in current ecosystem due to its beneficial aspects for their owners and their buyers. Data marketplaces \anote{for IoT data} have emerged which present a platform for data owners and buyers to negotiate and apply terms that both agreed to trade the needed data 
+
+% Currently, there are many projects working as a marketplace for data trading. 
+% \mycomment{Some of them}{need references} are showing a shared economy with real-time IoT data which generated from IoT devices in many domains. 
+% \mycomment{Many of them}{need references} are offering various datasets to be sold for either individuals, government or industries for the aggregation and analysis purposes. 
+
+% These traditional marketplaces has been selling the datasets where the data are not updated or not time sensitive. 
+% Unlike the marketplaces for real-time data that are generated from IoT. 
+% It is a difficult task to  design marketplaces for IoT data due to its characteristics which make them different from traditional datasets. \cite{misura} has shown unique IoT data features. The undependability of IoT data owner is one of its uniqueness. There are variety of IoT owner who produce data from their owned devices and sell it
+%  In addition, IoT data are gathered from real-time sensors such as temperature, humidity or car traffic is time sensitive. 
+%  If these data has not been used at the time of its generation it would loose their value and no longer needed. And because of the IoT data is time sensitive, a data buyer would have a trade agreement to buy data in advance which is a challenging task. Buying data in advance needs a mechanism in the marketplace to decide if the payment would be paid before of after delivering the data. If it is before subscribing the data, that means we require a system to fulfill the trade agreement that data provide and data buyer have, enforce the contract obligations to be done and guarantee delivering data to the consumers.
+
+% Currently, it has sown many marketplaces that are tailored to deal with IoT data in either centralized or in decentralized infrastructure. Misura in \cite{misura} has introduced a centralized marketplace as a cloud application based on a queuing system. Each data provider registers their sensors into the application with all details and description of the data. On the other hand, data consumer query the system for their needs and then  they will be advised by the system to the appropriate data provider who provide their needs. 
+
+% On the other hand, Datum \cite{24} has introduced a decentralized marketplace based on the emerging technology Blockchain. It is an IoT data marketplace which is designed to trade a stored IoT data based on Ethereum Blockchain network. A data provider achieves the scalability by storing his structural data securely in such BigchainDB and IPFS.  It uses the smart contract and the DAT token to enable the data buyer to get access to these data. 
+
+% The vision of our model is to have a decentralized marketplace for real-time IoT data with the use of the distributed ledger (Blockchain). It consists of two layers; data layer for exchanging data in the brokerage platform and Blockchain layer for the negotiation and trades contracts.
+
+% The remainder of this paper is organized as follows. Section \ref{CentModel} shows the centralized model. Section \ref{Motivation&Contribution} and \ref{RelatedWork&Background} show the motivation of our model and the related works. Section \ref{MKModel} and section \ref{Arch} show the marketplace model and the system architecture. Section \ref{Impl&Evaluation} shows the implementation and the evaluation of  consumer cost in the marketplace and then it will be ended by the conclusion in section \ref{conclusion}.
+
+
+\mynote{ORIGINAL TEXT BELOW}
+% In this paper we describe a Blockchain-based marketplace architecture that is designed to fulfill all of these 
+\subsection{Related Work} \label{sec:related}
+
+\mynote{make shorter and more concise}
 
 Literately, the blockchain technology is not a new concept in the computer community, it is just the result of the combination of three old concepts, peer-to-peer networks, public key cryptography and distributed consensus based on resolution random math challenges (Cryptographic hashing) \cite{2}. It can be defined as a fully-distributed, peer to peer network platform which can record immutable data, host applications \cite{2} and even transfer the ownership of digital assets which has a monetary value in the reality. Although it currently comes at a great computational cost, the characteristic of not relying on a trusted third party is held as their most important characteristic.
 
@@ -246,7 +230,28 @@ unlike the IOTA project \cite{20}, there is no need to record all IoT data in th
 
 \section{Marketplace Model} \label{sec:MKModel}
 
-We assume, following standard IoT data streaming practices, that the exchange of streaming data between any pair of  participants, i.e., a data Provider  $P$ and a Consumer $C$, is typically mediated by some transaction-agnostic broker infrastructure, such as the one shown in Fig.~\ref{fig:brokered-data-exchange}.
+
+\subsection{Centralized Brokered IoT Data Marketplace Architecture} \label{CentModel}
+
+\mynote{integrate this in sec. II}
+
+\begin{figure}
+  \caption{Centralized Brokered IoT Data Marketplace Architecture}
+  \label{fig:brokered-data-exchange}
+  \includegraphics[scale=0.4]{Cent}
+%   \centering
+
+\end{figure}
+
+Recent days, sharing the economy with IoT data has increased the demand for establishing IoT data marketplace. In brokered IoT data marketplace scenario as shown in Figure\ref{Cent} , data providers have to push their data through a centralized broker which then data consumers subscribe through predefined topics. A broker has the ability to count the number of messages published by a producer and subscribed by a consumer for all producers and consumers participated in the marketplace, which is dependable as a data source for the settlement process. The settlement process relies on the data metering from the broker and applies the settlement straightforward for both producer and consumer. 
+	
+In the above centralized reward data marketplace model, with the assumption of removing the trust from the broker, it could be a threat to alter or change some of data traffic metering between producers and consumers which would affect on the data authenticity, therefore the settlement process would be unsatisfied. This could be a vital factor in the marketplace sustainability especially with the absence of the trust and the lack of other secondary dependencies could be used to check the missed or altered metering data of the trade.
+The centralized infrastructure, as well as the third party- intermediators for data exchange, is not a centralized trusted component. It has been watched by the researchers that the trust issue has limited sharing data and killed the enthusiasm to be part of unreliable marketplace. While some of the current platforms have strength their model by many security mechanisms such as access control and authentication privacy, they still depend on the third party \cite{12}.
+
+
+
+
+We assume, following standard IoT data streaming practices, that the exchange of streaming data between any pair of  participants, i.e., a data Provider  $P$ and a Consumer $C$, is  mediated by some transaction-agnostic broker infrastructure, such as the one shown in Fig.~\ref{fig:brokered-data-exchange}.
 In this data transfer model, the stream is broken down into discrete message batches. Providers tag their messages with \textit{topics} that uniquely identify that Provider's stream. 
 A Consumer is allowed subscribe to a topic subject to the conditions set in a Trade Agreement, as described below.
 
