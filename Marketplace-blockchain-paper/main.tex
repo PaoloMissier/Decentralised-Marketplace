@@ -62,7 +62,6 @@
 \newcommand{\tp}{\ensuremath{\mathit{TP}}}
 \newcommand{\bn}{\ensuremath{\mathit{BN}}}
 \newcommand{\smartc}{\ensuremath{\mathit{SC}}}
-\newcommand{\rt}{\ensuremath{\mathit{RT}}}
 \newcommand{\bt}{\ensuremath{\mathit{BT}}}
 \newcommand{\rtEst}{\ensuremath{\widehat{\mathit{RT}}}}
 
@@ -81,7 +80,7 @@
 \usepackage{amssymb}  % assumes amsmath package installed
 
 \title{\LARGE \bf
-Decentralized Marketplace for Brokered IoT Data Trades using Blockchain
+A Decentralized, Trust-less Marketplace for Brokered IoT Data Trading using Blockchain
 }
 
 %\author{ \parbox{3 in}{\centering Huibert Kwakernaak*
@@ -131,10 +130,6 @@ We experimentally assess such trade-offs on a testbed using Ethereum Smart Contr
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}  \label{sec:intro}
 
-\anote{TODO: make sure links to sites etc are not part of biblio -- only use biblio for academic references.  put urls inline \url{blah} or as footnotes}
-
-\anote{TODO: redo figures for legibility and align thenm with text}
-
 Data streams that originate from Internet of Things (IoT) devices are increasingly viewed as tradeable assets with value not only to the device owners, but also with resell value, i.e., to third party buyers. 
 New forms of dedicated data marketplaces are emerging to help unlock such value~\cite{misura}, but these are comparatively less mature than more traditional data marketplaces for static data, cf. eg ~\cite{7004800,Schomm2013} for surveys on these.
 Unlike static data,  IoT data streams tend to lose their value if they are not consumed in near-real time, and data transmission and delivery may be unreliable. 
@@ -158,10 +153,7 @@ The approach suggested in the paper is based on the idea that each participant w
 
 In contrast, here we begin by proposing a different and much simpler protocol involving data providers, consumers, and a Smart Contract, based on the notion of periodic checkpoints during data exchange, supported by blockchain transactions to ensure limited scope for fraud on either side. 
 
-We then use our own prototype implementation of the  marketplace model on a private Ethereum network, to experimental evaluate the cost/risk trade-offs that are available by setting checkpoint frequency, also taking advantage of \textit{potential} external mechanisms for establishing trust amongst participants, \textit{if they are} available.
-
-
-requirements. It is a challenging task to have a public decentralized marketplace dealing with a live stream with no trusted component.
+We then use our own prototype implementation of the  marketplace model on a private Ethereum network, to experimentally evaluate the cost/risk trade-offs that are available by setting checkpoint frequency, also taking advantage of \textit{potential} external mechanisms for establishing trust amongst participants, \textit{if they are} available.
 
 % In addition, a blockchain is not designed to record too much data, so it has to employ the advantages of the blockchain in the marketplace for trades' obligations fulfillment and data exchange monitoring in the brokerage platform with taking into account the blockchain limitation e.g. scalability.
 
@@ -197,43 +189,57 @@ requirements. It is a challenging task to have a public decentralized marketplac
 % The remainder of this paper is organized as follows. Section \ref{CentModel} shows the centralized model. Section \ref{Motivation&Contribution} and \ref{RelatedWork&Background} show the motivation of our model and the related works. Section \ref{MKModel} and section \ref{Arch} show the marketplace model and the system architecture. Section \ref{Impl&Evaluation} shows the implementation and the evaluation of  consumer cost in the marketplace and then it will be ended by the conclusion in section \ref{conclusion}.
 
 
-\mynote{ORIGINAL TEXT BELOW}
 % In this paper we describe a Blockchain-based marketplace architecture that is designed to fulfill all of these 
 \subsection{Related Work} \label{sec:related}
 
-\mynote{make shorter and more concise}
+% Literately, the blockchain technology is not a new concept in the computer community, it is just the result of the combination of three old concepts, peer-to-peer networks, public key cryptography and distributed consensus based on resolution random math challenges (Cryptographic hashing) \cite{2}. It can be defined as a fully-distributed, peer to peer network platform which can record immutable data, host applications \cite{2} and even transfer the ownership of digital assets which has a monetary value in the reality. Although it currently comes at a great computational cost, the characteristic of not relying on a trusted third party is held as their most important characteristic.
 
-Literately, the blockchain technology is not a new concept in the computer community, it is just the result of the combination of three old concepts, peer-to-peer networks, public key cryptography and distributed consensus based on resolution random math challenges (Cryptographic hashing) \cite{2}. It can be defined as a fully-distributed, peer to peer network platform which can record immutable data, host applications \cite{2} and even transfer the ownership of digital assets which has a monetary value in the reality. Although it currently comes at a great computational cost, the characteristic of not relying on a trusted third party is held as their most important characteristic.
+% With the assumption of having a decentralized marketplace for IoT data leveraged by blockchain technology, we guarantee the trustworthy and transparency. The Immutability of transactions recorded in the blockchain is one of its strength and the key factor of providing a digital trustless environment to businesses. In the blockchain network, each transaction has been sent to the network is secure and transparent, thereby making the use of blockchain as a business infrastructure a good choice.
 
-With the assumption of having a decentralized marketplace for IoT data leveraged by blockchain technology, we guarantee the trustworthy and transparency. The Immutability of transactions recorded in the blockchain is one of its strength and the key factor of providing a digital trustless environment to businesses. In the blockchain network, each transaction has been sent to the network is secure and transparent, thereby making the use of blockchain as a business infrastructure a good choice.
+% Recently, many of financial sectors take the benefits of the blockchain (security, immutability, transparency) and trying to dispense with the intermediation and it will change the shape of companies’ friction everywhere \cite{2}\cite{9}\cite{10}. In the scenario of brokered IoT data marketplace, it is no longer need to pay fees for settlement provider to do the settlement in an untrusted environment. Moving to the decentralization infrastructure using blockchain solves one of critical issues in the in distributed environment as each node has to have the same version and the last update of the records
 
-Recently, many of financial sectors take the benefits of the blockchain (security, immutability, transparency) and trying to dispense with the intermediation and it will change the shape of companies’ friction everywhere \cite{2}\cite{9}\cite{10}. In the scenario of brokered IoT data marketplace, it is no longer need to pay fees for settlement provider to do the settlement in an untrusted environment. Moving to the decentralization infrastructure using blockchain solves one of critical issues in the in distributed environment as each node has to have the same version and the last update of the records.
+% The second generation of blockchain has introduced the smart contract. Any party in a business can move their contractual obligations to the blockchain network by writing their agreements as the form of smart contract and deploy it to the network. A smart contract is a piece of code (written in special high-level languages for writing contracts in blockchain such as Solidity) which is used to govern transactions exchanges between network nodes. It has been becoming the substitution to traditionally written contracts because of its key elements: autonomy, automation, and decentralization\cite{8}.  
 
-The second generation of blockchain has introduced the smart contract. Any party in a business can move their contractual obligations to the blockchain network by writing their agreements as the form of smart contract and deploy it to the network. A smart contract is a piece of code (written in special high-level languages for writing contracts in blockchain such as Solidity) which is used to govern transactions exchanges between network nodes. It has been becoming the substitution to traditionally written contracts because of its key elements: autonomy, automation, and decentralization\cite{8}.  
-
-The monetization of the huge amount of IoT data generated from its devices is a challenging task when taking in consideration many issues related to automation and scalability. There are many marketplaces tailored to deal with IoT data in various infrastructure e.g. centralized and decentralized which nourish the IoT data ecosystems either from individuals or companies e.g. Datacup, Microsoft Azure, sale’s data.com and BDEX. These projects are maintained by a central authority which controls and manage the trade between data provider and data buyer. Big IoT Marketplace \cite{14} is one example. It is a European project to enable IoT Ecosystems where IoT data producers can sell their data. It is a centralized marketplace which provide a BIG IoT API (as a lib) to enable the data providers offer their resources to be consumed. And by using the same API, consumers consume these resources easily. 
+The monetization of the huge amount of available IoT data is a challenging task with respect to automation and scalability. 
+Many marketplaces exist that are designed to deal with IoT data using  either centralized or  decentralized architectures, for instance Microsoft Azure, BDEX (\url{bdex.com}), 
+and Big IoT Marketplace (\url{http://big-iot.eu/}), a European project to enable IoT Ecosystems where IoT data producers can sell their data.
+These are all examples of centralised solutions where a central authority controls and manages the trades between data provider and data buyer.
  
- With the emerge of the blockchain, there are many blockchain-based platforms for implementing IoT data infrastructure. Some blockchain platforms are private or permissioned e.g. Hyperledger \cite{15},Quorum (\url{quorum.com}) \cite{16} and Corda \cite{17}. A Hyperledger platform shows low latency requirements for consensus but do not fully satisfy decentralization goals \cite{18}. While both Quorum and Corda proposing different approach of targeting financial institutions where IoT data are stored off chain and the consensus function is designed to ensure agreements among trade participants. Ethereum blockchain provides a public platform and automated agreements among interacting parties in the form of smart contract. In addition, it supports the development of DApps which make it one of the blockchin-based platforms to be chosen from. 
+A number of blockchain networks have been used to support IoT data exchange. Some, like Hyperledger \url{hyperledger.org}),Quorum (\url{jpmorgan.com/global/Quorum}) and Corda (\url{marketplace.r3.com}) are private or permissioned.
+Hyperledger shows low latency requirements for consensus but does not fully satisfy decentralization goals, while both J.P.Morgan's Quorum  and Corda target the financial sector using different approach, whereby  IoT data are stored off chain and the consensus function is designed to ensure agreements among trade participants. 
+ The Ethereum blockchain~\cite{Buterin2014}, used as a testbed for this work,  provides a public platform and automated agreements among interacting parties in the form of smart contracts and supports the development of DApps, making it one of the blockchin-based platforms of choice.
 
-Numerous of decentralized IoT marketplaces  have been emerged such as \cite{18}. It is a decentralized IoT data marketplace on ethereum blockchain which use the smart contract to manage and control the market and Raiden micropayment network for the payment. It is designed to trade a non real-time and not critical IoT data between IoT manufacture and data consumers. The approach is based on uploading an IoT dataset into Swarm and then get a “file handle which is cryptographic hash of the data. The file handle is unique identifier and address of data.”. A data vendor publishes what offers he has on the blockchain and then a data consumer can request these data after get paid for it in off-chain payment channel. Once the payment is done, a vendor sends the key of the data on Swarm and a consumer can access it. A voting system has been used by a consumer in order to vote for vendor as a straightforward feedback mechanism. 
+Some decentralized IoT marketplaces also exist. IDMoB~\cite{IDMoB} is designed to trade non real-time and not critical IoT data between IoT data producers and  consumers.
+It runs on Ethereum and uses Smart Contracts to manage and control the market and to interact with the Raiden micropayment network.
+% The approach is based on uploading an IoT dataset into Swarm and then get a “file handle which is cryptographic hash of the data. The file handle is unique identifier and address of data.”. A data vendor publishes what offers he has on the blockchain and then a data consumer can request these data after get paid for it in off-chain payment channel. Once the payment is done, a vendor sends the key of the data on Swarm and a consumer can access it. A voting system has been used by a consumer in order to vote for vendor as a straightforward feedback mechanism. 
 
-A marketplace done by \cite{19} to monetize IoT data using smart contract in the blockchain. Suliman A. et al \cite{19} showed that their approach based on sending IoT data through MQTT broker and at the top layer, using the smart contact to manage and settle the payment. First, an IoT device owner has to interact with the smart contract to create a contract with the broker including the topic details where the IoT data sending through. A consumer on the other hand make a deposit to this contract to subscribe from this topic. Then, an IoT device owner send token and the duration of accessing data. An off chain connection will be created between the consumer and the MQTT broker to send the data off chain. Once the duration over, the consumer disconnects or the deposit consumed, the connection is stopped. The approach does not give the consumer the flexibility to set the duration he needs to consume the data while it depends on how much he deposited. The subscription still until either the consumer disconnects or the deposit is used up. If the consumer decides to consume more data and no deposit has, he has to deposit again which cost some gas and considered as extra cost. it could be avoided if the consumer has a clear agreement with the desired period before the data exchange.
+Suliman A. et al \cite{19} propose a marketplace to monetize IoT data using smart contract in the blockchain. Similar to our model, their approach involves sending IoT data through MQTT broker and using smart contracts to manage and settle payments. The main difference with our approach is that a deposit is required before subscription to a topic may take place. This conflicts with our no-trust assumption, as leaving a deposit ahead of receiving goods is likely to be viewed as risky by the buyer.
 
-Huang Z. et al \cite{12} presented a decentralized platform for IoT data exchange using blockchain technology in order to achieve the trustworthy and the transparency. They proposed a platform for data provider and data buyer to exchange data without the need for the mutual trust based on blockchain technology advantages. The intrinsic data exchange is done out of the blockchain network while the only data exchange details are recorded and kept in the blockchain. A data provider uploads the data off chain, the system’s smart contract will create a data object and id referred as “DAT”. When a consumer request for accessing data, a data producer will provide some conditions to the demander which has to be met in order to get access. Once the consumer has met theses conditions, a consumer will be put in the list of authorized access od the data with DAT id and con download the data either from URL, FTP or PEP. This marketplace is not designed for a real-time data and it cannot be classified as a marketplace for IoT data streams while if the period of accessing the data is unlimited once the consumer has the link to download the data. In addition, there is no guarantee that the link given to the consumer has the correct data that consumer needs, so it could be a garbage or damaged data.   
+% First, an IoT device owner has to interact with the smart contract to create a contract with the broker including the topic details where the IoT data sending through. A consumer on the other hand make a deposit to this contract to subscribe from this topic. Then, an IoT device owner send token and the duration of accessing data. An off chain connection will be created between the consumer and the MQTT broker to send the data off chain. Once the duration over, the consumer disconnects or thain e deposit consumed, the connection is stopped. The approach does not give the consumer the flexibility to set the duration he needs to consume the data while it depends on how much he deposited. The subscription still until either the consumer disconnects or the deposit is used up. If the consumer decides to consume more data and no deposit has, he has to deposit again which cost some gas and considered as extra cost. it could be avoided if the consumer has a clear agreement with the desired period before the data exchange.
+
+Huang Z. et al.'s decentralized platform for IoT data exchange~\cite{12} comes close to addressing issues of mis-trust amongst participants, and similar to our approach, data is exchanged off-chain and made available to buyers once the contract is in place. However, the data to be purchased is stored, making this solution unsuitable for streaming. Furthermore, no guarantees are offered to ensure that the data is genuine, so advance payment i.e. to get access to data download is risky.
+
+% presented a decentralized platform for IoT data exchange using blockchain technology in order to achieve the trustworthy and the transparency. They proposed a platform for data provider and data buyer to exchange data without the need for the mutual trust based on blockchain technology advantages. The intrinsic data exchange is done out of the blockchain network while the only data exchange details are recorded and kept in the blockchain. A data provider uploads the data off chain, the system’s smart contract will create a data object and id referred as “DAT”. When a consumer request for accessing data, a data producer will provide some conditions to the demander which has to be met in order to get access. Once the consumer has met theses conditions, a consumer will be put in the list of authorized access od the data with DAT id and con download the data either from URL, FTP or PEP. This marketplace is not designed for a real-time data and it cannot be classified as a marketplace for IoT data streams while if the period of accessing the data is unlimited once the consumer has the link to download the data. In addition, there is no guarantee that the link given to the consumer has the correct data that consumer needs, so it could be a garbage or damaged data.   
 	
-Blockchain technology can leverage fair and trust marketplace for IoT data to be exchanged, but it is not adequate to manage and control the data exchange out of the blockchain network. While there is no mutual trust between data producer and data consumer before involving in a trade, so there are some risks for both of them to involve in a trade with party not trusted. it is necessary to guarantee that both of them behave honestly in off-chain data exchange and assess all their trades involved to help to take a decision for future trades.   
+% Blockchain technology can leverage fair and trust marketplace for IoT data to be exchanged, but it is not adequate to manage and control the data exchange out of the blockchain network. While there is no mutual trust between data producer and data consumer before involving in a trade, so there are some risks for both of them to involve in a trade with party not trusted. it is necessary to guarantee that both of them behave honestly in off-chain data exchange and assess all their trades involved to help to take a decision for future trades.   
 
-One of the blockchain platform which is targeting the decentralized IoT data marketplace is IOTA \cite{20}. They have announced at the end of 2017 that they will support decentralized marketplaces, “the goal is to enable a truly decentralized data marketplace to open up the data silos that currently keep data limited to the control of a few entities.”. 
-The project is essentially a blockchain that was created specially for the IoT and use their own unique public ledger architecture called Tangle (directed acyclic graph data structure to store transactions). 
-It is designed to cope the blockchain limitation in scalability where in IOTA, all real-time IoT data are stored on the chain. 
-unlike the IOTA project \cite{20}, there is no need to record all IoT data in the chain and only need to store the metadata and the trade details between a producer and a consumer as a trade agreement.
+Finally, a recently proposed alternative blockchain provider, IOTA (\url{iota.org}), announced their support for decentralized marketplaces  at the end of 2017, with the goal of ``enabling a truly decentralized data marketplace to open up the data silos that currently keep data limited to the control of a few entities''. 
+One distinguishing feature of this solution is that, unlike others cited above, here the IoT data is actually stored in the blockchain (or IOTA's version of it, called the Tangle~\cite{Popov2016}. 
+To the best of our knowledge this solution has not yet been released.
+
+% The project is essentially a blockchain that was created specially for the IoT and use their own unique public ledger architecture called Tangle (directed acyclic graph data structure to store transactions). 
+% It is designed to cope the blockchain limitation in scalability where in IOTA, all real-time IoT data are stored on the chain. 
+% unlike the IOTA project \cite{20}, there is no need to record all IoT data in the chain and only need to store the metadata and the trade details between a producer and a consumer as a trade agreement.
+
+Trust and reputation management is not directly addressed in this paper, however a trust management model should also be established as part of the marketplace. Existing trust frameworks can be used on top of our infrastructure.
+Yan et al. \cite{Yan2014a}, for instance, explore the notion of trust across the IoT platform layers (physical sensing, network, and application layers), with the focus on a wide range of properties from security to goodness, strength, reliability, availability, ability of data. However, their survey largely overlooks issues of trust amongst participants in a data marketplace, i.e., in the context of data exchange transactions.
+%
+%\note{ Roman, D., \& Stefano, G. (2016). Towards a Reference Architecture for Trusted Data Marketplaces: The Credit Scoring Perspective. In 2016 2nd International Conference on Open and Big Data (OBD) (pp. 95–101). IEEE. https://doi.org/10.1109/OBD.2016.21}
+More directly useful in our setting, is Roman and Gatti's study of trust in data marketplaces \cite{7573695}, based on \textit{credit scoring}, where a direct connection is made to the use of blockchain technology with data trading.
 
 \section{Marketplace Model} \label{sec:MKModel}
 
-
-\subsection{Centralized Brokered IoT Data Marketplace Architecture} \label{CentModel}
-
-\mynote{integrate this in sec. II}
+\subsection{Brokered IoT Data Exchange} \label{sec:daga-exchange}
 
 \begin{figure}
   \caption{Centralized Brokered IoT Data Marketplace Architecture}
@@ -243,20 +249,25 @@ unlike the IOTA project \cite{20}, there is no need to record all IoT data in th
 
 \end{figure}
 
-Recent days, sharing the economy with IoT data has increased the demand for establishing IoT data marketplace. In brokered IoT data marketplace scenario as shown in Figure\ref{Cent} , data providers have to push their data through a centralized broker which then data consumers subscribe through predefined topics. A broker has the ability to count the number of messages published by a producer and subscribed by a consumer for all producers and consumers participated in the marketplace, which is dependable as a data source for the settlement process. The settlement process relies on the data metering from the broker and applies the settlement straightforward for both producer and consumer. 
-	
-In the above centralized reward data marketplace model, with the assumption of removing the trust from the broker, it could be a threat to alter or change some of data traffic metering between producers and consumers which would affect on the data authenticity, therefore the settlement process would be unsatisfied. This could be a vital factor in the marketplace sustainability especially with the absence of the trust and the lack of other secondary dependencies could be used to check the missed or altered metering data of the trade.
-The centralized infrastructure, as well as the third party- intermediators for data exchange, is not a centralized trusted component. It has been watched by the researchers that the trust issue has limited sharing data and killed the enthusiasm to be part of unreliable marketplace. While some of the current platforms have strength their model by many security mechanisms such as access control and authentication privacy, they still depend on the third party \cite{12}.
-
-
-
-
 We assume, following standard IoT data streaming practices, that the exchange of streaming data between any pair of  participants, i.e., a data Provider  $P$ and a Consumer $C$, is  mediated by some transaction-agnostic broker infrastructure, such as the one shown in Fig.~\ref{fig:brokered-data-exchange}.
 In this data transfer model, the stream is broken down into discrete message batches. Providers tag their messages with \textit{topics} that uniquely identify that Provider's stream. 
 A Consumer is allowed subscribe to a topic subject to the conditions set in a Trade Agreement, as described below.
 
-The goal of the marketplace is to enable trading of such streaming data while offering guarantees, i.e., 
-regarding the max  loss incurred by either of them in case of adversarial behaviour, as well as to resolve disputes about the amount of data exchanged.
+In our previous work~\cite{Missier2017} we assumed initially a network architecture where the broker is a trusted component that can be relied upon to generate truthful data exchange reports, which in turn can be used to settle disputes between producers and consumers  (the ``cubes'' in Fig.~\ref{fig:brokered-data-exchange}).
+In this scenario, the Smart Contract is simply in charge of settlement given the reports. 
+In the same paper, we then proposed a more ambitious trust-less model where the task of generating reports is left to each participant. In this case the Smart Contract has a difficult task because the report themselves cannot be trusted, and disputes cannot be settled by ascribing certain responsibility to either participant.
+
+
+% % Recent days, sharing the economy with IoT data has increased the demand for establishing IoT data marketplace. In brokered IoT data marketplace scenario as shown in Figure\ref{Cent} , data providers have to push their data through a centralized broker which then data consumers subscribe through predefined topics. A broker has the ability to count the number of messages published by a producer and subscribed by a consumer for all producers and consumers participated in the marketplace, which is dependable as a data source for the settlement process. The settlement process relies on the data metering from the broker and applies the settlement straightforward for both producer and consumer. 
+	
+% In the above centralized reward data marketplace model, with the assumption of removing the trust from the broker, it could be a threat to alter or change some of data traffic metering between producers and consumers which would affect on the data authenticity, therefore the settlement process would be unsatisfied. This could be a vital factor in the marketplace sustainability especially with the absence of the trust and the lack of other secondary dependencies could be used to check the missed or altered metering data of the trade.
+% The centralized infrastructure, as well as the third party- intermediators for data exchange, is not a centralized trusted component. It has been watched by the researchers that the trust issue has limited sharing data and killed the enthusiasm to be part of unreliable marketplace. While some of the current platforms have strength their model by many security mechanisms such as access control and authentication privacy, they still depend on the third party \cite{12}.
+
+\subsection{Model Elements}
+
+In this work we work around these difficulties, as we do not require the broker or the participants to generate any report at all. 
+Instead, the broker is simply a network element. The goal of the marketplace is twofold. 
+Firstly, to enable trading of streaming data through the broker while offering guarantees, i.e., regarding the max  loss incurred by either of them in case of adversarial behaviour. And secondly, to resolve disputes about the amount of data exchanged.
 %
 To achieve this, we augment the data exchange with the exchange of \textit{data receipts} between $C$ and $P$, which occurs at regular intervals and throughout the duration of the data stream. Such receipts are exchanged as part of transactions that are mediated by a smart contract, denoted \smartc, on the blockchain. 
 The length of the exchange interval, denoted as Batch Size or \bs, is set at the time of trading agreement negotiation. 
@@ -267,7 +278,7 @@ The model consists of the following elements:
 	
 	\item The description of data offered by a Producer;
 	
-	\item A trade agreement, which includes details of the data to be exchanged and the exchange protocol, the corresponding market value, and additional parameters such as the \bs mentioned above;
+	\item A trade agreement, which includes details of the data to be exchanged and the exchange protocol, the corresponding market value, and additional parameters such as the \bs{} mentioned above;
 	
 	\item A protocol for the exchange of data receipts, which includes both parties in addition to a neutral smart contract;
 	
@@ -303,7 +314,7 @@ The trade agreement is a legally binding contract (we use the term ``agreement''
 An agreement comes into force when (i) it is signed by both parties using their blockchain account keys (Ethereum in our implementation), and (ii) a smart contract transaction containing the agreement is committed to the blockchain, at which point it can no longer be amended.
 The agreement contains (i) a specific data offering \doff{} and (ii) a time interval $\tati$, contained within the time interval \ti, during which the agreement is in force.
 For instance, $C$ may want to subscribe to a portion of an event that is offered over a long period of time.
-For convenience we denote the total price as $\tp = \up \cdot \tati$ and the total number of messages in the agreement as $\etm = \mr \cdot \tati$.
+We denote the total price as $\tp = \up \cdot \tati$ and the total number of messages in the agreement as $\etm = \mr \cdot \tati$.
 
 %
 %
@@ -313,33 +324,49 @@ For convenience we denote the total price as $\tp = \up \cdot \tati$ and the tot
 \subsection{Data Receipt protocol}  \label{sec:protocol}
 
 Once the trade agreement is in force,  $C$ is allowed to subscribe to $P$'s stream.
-When both parties comply with the agreement and data transfer takes place as expected, at the end of the \tati{} interval $C$ informs the smart contract \smartc{} that the agreement has been fulfilled, and \smartc{} proceeds to settle the payment as per the agreement.
+Under normal circumstances and when both parties comply with the agreement and data transfer takes place as expected, at the end of the \tati{} interval $C$ informs \smartc{} that the agreement has been fulfilled, and \smartc{} proceeds to settle the payment as per the agreement.
 Suppose however that $C$ fails to inform \smartc. This may happen because $C$ actually failed to receive some of the data in the stream, or because it fraudolently \textit{claims} not to have received the data.
 In our model we assume that \smartc{} is unable to distinguish between these two events, because there is no requirement for the data broker to keep a (verifiably truthful) log of its message delivery.
 In this situation, the only possible course of action for \smartc{} is to believe $C$'s claim, and to withhold $P$'s payment as a consequence.
 Thus, assuming minimal accountability on the broker and no trust amongst participants, $P$ may become the victim of $C$'s fraud.
 
-Our approach to mitigate this possibility is to introduce checkpoints throughout the duration of data delivery. 
-The number of messages between two checkpoints is the batch size \bs. 
-At each checkpoint $C$ is expected to send a \textit{data receipt} to \smartc{} as part of a blockchain transaction, which acknowledges receipt of one batch of data from $P$.
-When this happens, \smartc{} records the receipt and then informs $P$ acknowledging that the transaction has been confirmed.
-At the same time, at the end of each batch $P$ suspends its streaming to $C$ until it receives the acknowledgment from \smartc.
+Our approach to mitigate this circumstance is to introduce \textit{checkpoints} throughout the duration of data delivery. 
+The number of messages between two checkpoints is the batch size \bs, which $P$ can configure as part of the agreement negotiation with $C$.
+At each checkpoint, $C$ is expected to send a \textit{data receipt} to \smartc{} as part of a blockchain transaction, which acknowledges receipt of one batch of data from $P$.
+When the transaction is confirmed, \smartc{} records the receipt and then informs $P$.
+Meanwhile, at the end of each batch $P$ will have suspended its streaming to $C$ until it receives the acknowledgment from \smartc.
 If $P$ does not receive a message within a certain time limit, it times out and terminates the trade agreement (in practice, $C$'s subscription to the stream is cancelled).
 Thus, the data exchange protocol and data receipt protocols are interconnected as shown in Fig.~\ref{fig:batching}.
-It is straightforward to see that $P$'s max data loss is simply one batch  of messages.
 
-Thus,  $P$ controls the the max loss of data and thus its risk by setting the value of \bs.
-A small value ensures that data loss will be limited to a few data batches (see below for details), while a large \bs{} exposes $P$ to a higher risk of fraud.
+The timeout is a configurable parameter that reflects the expected time required for a receipt transaction to be confirmed on the blockchain. 
+In our experiments we model this time as a random variable, denoted \rtEst, 
+
 
 %The max loss of data from $P$ depends by the time required for each receipt smart contract transaction to be confirmed on the blockchain.
 %When using the simple protocol just defined, $C$, $P$ and \smartc{} interact throughout the data exchange period \ti{} as illustrated i Fig.~\ref{fig:batching}.
 %As we can see in the figure, when no fraud occurs $C$ issues a receipt transaction to \smartc{} every \bs{} messages, confirming the number of messages received with the last batch. 
 %The time required for this transaction to be confirmed on the blockchain is a random variable whose distribution depends on the network load and the unit gas price chosen to enable the smart contract (in the case of Ethereum). 
 %Let \rtEst{} denote the expected value for this distribution, that is, the expected transaction confirmation time.
-%Since $P$ cannot assume that the receipt has been issued until it is confirmed, and data streaming continues during this time, $P$ uses \rtEst{} as a timeout to prevent unbounded losses.
-%It starts its timer at the end of each batch, and if no message is received from \smartc{} after \rtEst{} has elapsed, it terminates the contract (the broker terminates $C$'s subscription).
 
 \subsection{Cost of agreements}  \label{sec:cost}
+
+\mynote{FIXME}
+
+$P$'s objective is to balance the risk of losing data, against the cost In this setting, \textit{data loss} refers 
+
+It is straightforward to see that $P$'s max data loss is simply one batch  of messages.
+
+Thus,  $P$ controls the the max loss of data and thus its risk by setting the value of \bs.
+A small value ensures that data loss will be limited to a few data batches (see below for details), while a large \bs{} exposes $P$ to a higher risk of fraud.
+
+\mynote{need to explain provider timeout. rewrite the following sentence: \\
+Since $P$ cannot assume that the receipt has been issued until it is confirmed, and data streaming continues during this time, $P$ uses \rtEst{} as a timeout to prevent unbounded losses.
+It starts its timer at the end of each batch, and if no message is received from \smartc{} after \rtEst{} has elapsed, it terminates the contract (the broker terminates $C$'s subscription).
+}
+
+\mynote{must say something about how reputation scoire is updated at the end of each transaction. just say there is a mechanism but it is out of scope.}
+
+
 
 Setting \bs{} correctly for each transaction is critical to achieving a sustainable marketplace, because checkpoints are smart contract transactions and as such, in blockchain models like Ethereum, they each incur a fee. There is therefore a trade-off between the risk of losing data and the cost of engaging in a long-running transaction with many checkpoints along the way.
 To make this observation precise, let us calculate the total cost of purchasing a data stream from a provider, as a function of the tunable parameter \bs.
@@ -356,14 +383,27 @@ While these are all one-off costs and can be regarded as constant, the receipt p
 \[\bn = \ceil[\bigg] {\frac{\etm}{\bs}} \]
 transactions (the ceiling accounts for fractional batches at the end of the \tati{} period). 
 Assuming the Ethereum cost model with gas unit price \gup{} and gas consumption per transaction \gt, the total cost \rc{} due to the receipt transactions is 
-\[\rc = \bn \cdot  \gt \cdot \gup    \]
+\[\rc = \bn \cdot  \gt \cdot \gup    \] \label{RC}
 
-\mynote{Shaimaa:  the equation $\bn=\frac{\tati}{\bt+\rt}$ assumes that \tati{} includes all the \rt{} intervals, but I think in our latest discussion we have decided this is not the case -- think of \tati{} as the duration of a game, that should not include the ``advert'' time \rt{}. instead \bn{} is defined simply as above, which means that if $\bs=C_{rep} \cdot \etm$, then the cost \bn{} reduces simply to $1/C_{rep}$.
+\mynote{Shaimaa:  the equation $\bn=\frac{\tati}{\bt+\rt}$ assumes that \tati{} includes all the \rt{} intervals, but I think in our latest discussion we have decided this is not the case -- think of \tati{} as the duration of a game, that should not include the ``advert'' time \rt{}.
 }
 
-This cost is inversely proportional to \bs{}. In our experiments we have assumed $\bs= f(\crep) \cdot \etm$ where   $f(\crep{}) \leq 1$ is a function of $C$'s current reputation score, \crep.
+% instead \bn{} is defined simply as above, which means that if $\bs=C_{rep} \cdot \etm$, then the cost \bn{} reduces simply to $1/C_{rep}$.
+
+
+This cost is inversely proportional to \bs{}. In our experiments we have assumed $\bs= f(\crep) \cdot \etm$ where   $f(\crep{}) \leq 0.25$ is a function of $C$'s current reputation score, \crep.
 In this case, \bn{} simplifies to $\bn =  1/f(\crep{})$.
-Function $f(.)$ is a parameter in the model and can be chosen to either amplify or reduce the effect of reputation. In our experiment we use a linear function with \mynote{can you complete this?  I know you have used $\crep \cdot \mr$ but as discussed, this looks incorrect}
+Function  $f(\crep{})$ is a parameter in the model and can be chosen to either amplify or reduce the effect of reputation. In our experiment we have used a logarithmic function:  $f(\crep{}) = \ln(\crep + 1)/2.77 $. This function has the effect to normalize \bs{} in such a way that 
+%and divided by a constant number $2.77$ where
+the minimum number of receipts is 4.
+%, i.e., four receipts are geneso a consumer may interact TATI-quarterly for a transaction and also reduce the maximum risk a producer could lose to the quarter. 
+
+\mynote{sentence below needs to be  clarified}
+Note that the minimal number of receipts could be $\bs = 25\% of ETM $ for $f(1)$ is $4$ which is fairly bands the less reputations into smaller groups of the same number of receipts based on the their reputations.
+
+\mynote{will explain why 2.77 in the implementation}
+
+% use a linear function with \mynote{can you complete this?  I know you have used $\crep \cdot \mr$ but as discussed, this looks incorrect}
 
 \begin{figure*}
 	\caption{Data receipt protocol Interactions between $C$, $P$ and \smartc{}}
@@ -372,11 +412,7 @@ Function $f(.)$ is a parameter in the model and can be chosen to either amplify 
 	\centering
 \end{figure*}
 
-
-
 %\anote{EDITED  ABOVE -- ORIGINAL BELOW -- PM}
-
-
 
 %\subsection{Data Batching}
 %With the absence of central trust, our approach is a receipt-based model. A consumer is required to send a receipt for every data he received, for this, the real-time stream has to be divided into batches.
@@ -436,9 +472,14 @@ Function $f(.)$ is a parameter in the model and can be chosen to either amplify 
 %     \caption{Data Stream Categories}%
 %     \label{ConDisStreams}%
 % \end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\anote{I think this is all we need for this section. much simplified because behind the many equation the storyr is actually very simple, so I commented out the original text--- but please look at the comments.}
-%
+% \anote{I think this is all we need for this section. much simplified because behind the many equation the storyr is actually very simple, so I commented out the original text--- but please look at the comments.}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
 %\subsection{Last Data Package}
 %As agreed in the TA, the data stream will be stopped once the subscription expires. Therefore, if there was a batch has been starting and has not been completed yet, the data provider has to stop streaming the data and the consumer must send a receipt for data portion he received, lets call it (Last Data Package in the trade LP) as shown in figure \ref{Stream}. A processing time for the receipt (LPRT) will be out of TATI which means the smart contract will wait LPRT time to receive the last receipt and then  add it to the total receipts have to make the settlement. It is expected by the smart contract to receive a receipt for the LP within a period of time $LPRT $where $LPRT = RT$.
 
@@ -591,7 +632,7 @@ Function $f(.)$ is a parameter in the model and can be chosen to either amplify 
 %
 %Where $C_{cost}$ is a consumer cost in a trade.
 
-\section{System Architecture ans Workflow} \label{Arch}
+\section{System Architecture and Workflow} \label{Arch}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{figure*}
@@ -605,20 +646,25 @@ Function $f(.)$ is a parameter in the model and can be chosen to either amplify 
 
 The system is divided into two layers; Data Layer and Blockchain Layer. In data layer, all IoT data will be transferred off chain from data producers to data consumers through brokers in-between, while in the blockchain layer, the negotiation and the the final trade agreement will be created and recorded. The blockchain layer is represented as a set of automated smart contracts written in Solidity (high-level language for writing a smart contract on Ethereum network and executed in Ethereum Virtual Machine EVM in Ethereum network).
 
-As shown in Figure\ref{SSD}, the marketplace starts that each participant must register his address in the blockchain by interacting with the smart contract and calling the register method. A data provider publishes/updates his offers to what data he has. All offers will be stored in the blockchain and visible to anyone. On the other hand, a data consumer checks data providers and their offers, and then when he decides to subscribe data, he has to interact with the smart contract with his offer’s choice and the time interval who would like the subscription start and end. A new TA is created and signed by consumer by his private key in the blockchain and has been deployed. Next, a data provider checks this consumer’s reputation in the marketplace and then set the data batch size if it is zero or it would be calculated automatically, add it to the TA and then deployed it to the blockchain with his signature. Now, we have a new TA signed by both trade’s parties and visible to anyone and can not be amended. 
+As shown in Figure\ref{SSD}, the marketplace starts that each participant must register in the blockchain by interacting with the smart contract and calling the register method. A data provider publishes/updates his offers to what data he has. All offers will be stored in the blockchain and it is visible for anyone. On the other hand, a data consumer checks list of available offers , and then when he decides to subscribe data, he has to interact with the smart contract with his offer’s choice and the time interval who would like the subscription start and end. A new TA is created and signed by consumer by his private key in the blockchain and has been deployed. Next, a data provider checks this consumer’s reputation in the marketplace and then set the data $BS$ if it is zero or it would be calculated automatically, add it to the TA and then deployed it to the blockchain with his signature. Now, we have a new TA signed by both trade’s parties and visible to anyone and can not be amended. 
 
-The data provider at the start time of the subscription starts sending the data batches as agreed in the TA. When a first batch has been sent, a consumer should send a receipt to the smart contract reporting what he received. A smart contract will check if the data received is equal to the batch size set in the agreement, meanwhile, the provider is paused and waiting for the acknowledgment to be triggered. If the data delivered was not equal the data batch, the smart contract will trigger an event that the trade is going to fail and therefore, the reputation and settlement contract ends the the trade immediately and release the tokens to the producer as mush as reported in the receipt and return back the rest to the consumer balance. Eventually, a reputation score is updated and eventually the trade is labeled failed. 
+The data provider at the start time of the subscription starts sending the data batches as agreed in the TA. When a first batch has been sent, a consumer should send a receipt to the smart contract reporting what he received. A smart contract will check if the data received is equal to $BS$ as stated in the agreement. Meanwhile, the provider is paused and waiting for the acknowledgment to be triggered. 
+
+It has to mention that while a $P$ can not resume sending the next batch until receipt transaction confirmed by miners, $SC$ would set the the timeout \rtEst{} before terminating the trade's contract and trigger the acknowledgment that a $P$ must stop sending batches.In this stage, the settlement function release the tokens to the producer as mush as reported in the receipt and return back the rest to the consumer balance. Eventually, a reputation score is updated and eventually the trade is labeled failed and a a consumer score will be affected based on the last missed receipt. The reputation score has been updated by the end of each trade in such a way recalculate the new score to be used in the marketplace for next trades, but its mechanism is out of this paper scope.
+
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Implementation and evaluation} \label{sec:evaluation}
 
-The decentralized brokered IoT data marketplace model has implemented the trade management and the settlement service as set of smart contracts in the blockchain written by the high-level language \textit{Solidity} in Ethereum platform. 
+The decentralized brokered IoT data marketplace model has implemented the trade management and the settlement service as set of smart contracts in the blockchain written by scripting, high-level language \textit{Solidity} in Ethereum platform. 
 
-For experimentation and evaluation purposes, we have written a smart contract in Solidity – Ethereum’s scripting language and then deployed it in a private Ethereum test network. We used Ethereum web browser based IDE Remix \cite{25} to write, deploy and connect to the private chain through Remote Producer Call (RPC) protocol. We have used the fake accounts with their balances provided by Remix (each with 100 ether) as a trades’ participants e.g. producer and consumer. 
+For experimentation and evaluation purposes, we have written the smart contracts and then deployed it in a private Ethereum test network. We used Ethereum web browser based IDE Remix (\url{remix.ethereum.org}) to write, deploy and connect to the private chain through Remote Producer Call (RPC) protocol. We have used the fake accounts with their balances provided by Remix as a trades’ participants. 
 
-Each account has to interact with the smart contract in order to register in the network by providing a name and the role type to act in the network, e.g. producer or consumer. Then, a producer consumes gas to interact with the smart contact to deploy his offer to the network, and on the other hand a consumer interacts to get an offer. Another gas consumption for the consumer is in interacting with the smart contract to make an order based on provided offers, initiate a new TA and deposit the full amount of the trade based on the estimated data amount might be delivered in a trade ETM. In this stage, a batch size has been set based on the consumer reputation and eventually sign the current TA with this candidate consumer. 
+Each account has to interact with the smart contract to register in the network by providing an id and a role in the marketplace, i.e. producer or consumer. Then, a producer incur gas to deploy offer(s), and on the other hand a consumer interacts to get an offer. Another gas consumption for the consumer is in interacting with the smart contract to request trade based on provided offers, initiate a new TA and deposit the full cost of the trade based on the estimated messages are expecting to be delivered ETM. In this stage, BS has been set based on the consumer reputation and eventually sign the current TA with this candidate consumer. 
 
-Based on the protocol proposed, the consumer has to send a receipt for every batch received. He costs an authentication fees (BN + LPN) times where BN and LPN is the total number of batches received in a trade and the last data package (1 if any, 0 otherwise), respectively. Table \ref{GasTable} shows the gas consumed by each producer and consumer for a trade in the marketplace. We have measured the gas consumption using Remix debugger which provide a consumed gas for every transaction done. Also, it can be calculated by monitoring the balances of participants and check the differences before and after invoking the smart contract method. Table \ref{GasTable} shows the cost categories whose either producer or consumer or both have to spend.
+Based on the receipt protocol proposed, a consumer has to send a receipt $BN$ times for every batch received.
+
+Table \ref{GasTable} shows the cost categories whose either producer or consumer or both incur in the marketplace. We have measured the gas consumption using Remix debugger which provide a consumed gas for every transaction done. Also, it can be calculated by monitoring the balances of participants and check the differences before and after invoking the smart contract method. 
 
 \begin{table}[h]
 \caption{shows transactions cost in each cost category (in Gas)}
@@ -632,7 +678,7 @@ Based on the protocol proposed, the consumer has to send a receipt for every bat
 \textbf{\makecell{Producer\\Gas\\Consumption}} & 
 \textbf{\makecell{Consumer\\Gas\\Consumption}} \\
 \hline
-\centering\makecell{Registration \\Cost} & \makecell{- Register \\in\\ the network} & 204739 gas & 199093 gas 
+\centering\makecell{Registration \\Cost} & \makecell{- Register in\\ the network} & 204739 gas & 199093 gas 
   \\
 \hline
 \makecell{Offering \\Cost} & - Deploy an offer & 491862 gas & - \\
@@ -641,7 +687,7 @@ Based on the protocol proposed, the consumer has to send a receipt for every bat
 
 & \makecell{- Set Batch size \\and sign off \\ the TA} & 82063 gas & - \\ 
 \hline
-\makecell{Authentication\\Cost} & - Send a receipt & - &  144367 gas \\
+\makecell{Receipt\\Cost} & - Send a receipt & - &  144367 gas \\
 
 \hline
 \end{tabular}
@@ -650,18 +696,66 @@ Based on the protocol proposed, the consumer has to send a receipt for every bat
 \end{table}
 % 
 
-The settlement is done by the settlement smart contract when the trade ends. 
-The consumer honesty defines the batch size of the data in a trade due to the proposed protocol that the batch is a function of a consumer reputation in the marketplace. If a consumer reputation is high, a batch size will be large and a he can receive more data in one batch. Similarly, a consumer who has a low reputation receives a less data in the batch. The increase in a number of batches received means that a consumer will cost more gas to interact with the smart contract to send receipts. If we assume that a producer has no incentive not to send the data as agreed in the TA, and with a guarantee the quality of service, a trade would be failed if a consumer was not send a receipt or was not honest in reporting the exact number of data he received. It is crucial for a marketplace sustainability to have an honest consumer in order to have successful trades, and also for the consumer financial affairs to be avoided from many smart contract invocations and therefore extra cost (authentication cost).
+The settlement is done by the settlement smart contract when the trade ends. Based on the protocol proposed, $BS$ is $f(C_{rep})$ which is directly proportion to $C_{rep}$. We have done many experiment to pick the constant number $f(C_{rep})$ and set the minimum receipts could have. For the purpose of evaluating, we have fixed the parameters TATI with 1 day (24 hours), $MR = 100 m/s $ and use three different constants $1.38, 2.10, 2.77$ to to normalize $BS$ in such way that the minimum number of receipts are $2,3 and 4$, respectively. Table\ref{ReceiptNumber}.
 
-In our evaluation, we focus on the association between consumers’ honesty (reputation) and the cost they have to spend to reach to a successful trade. An honest consumer who has high reputation spends less than a consumer who has low reputation. When a consumer is an honest, he shows his willing to behave well in the marketplace which significantly reflect on the batch size of that trade who involve in. While the batch size is directly proportional to consumer honesty, this would be a motivation for a consumer to have high reputation in order to reduce his cost.
 
-Because a gas price determines the average time of the transactions in the blockchain to be processed by miners, a consumer has the potential to increase the gas price in order to process his transaction faster and therefore he will have more time to receive more batches. 
+\begin{table}[h]
+\caption{Minimum number of receipts with three different constant values in $f(C_{rep})$}
+\label{ReceiptNumber}
+\begin{adjustbox}{width=0.48\textwidth}
+\begin{tabular}{|c||c||c||c|}
+\hline
+\textbf{Reputation} &\textbf{$\ln(\crep + 1)/1.38$} & \textbf{$\ln(\crep + 1)/2.10$} & \textbf{$\ln(\crep + 1)/2.77$} \\
 
-It has to notice that the transaction of sending receipts to the smart contract has to be processed in the period of time, so a consumer may increase the gas price of his transactions to give his transaction the priority to be picked by miners. Miners who will validate the transactions usually follow the strategy of picking the transactions’ heights gas price to be included in the next block in order for high rewards. Because of the transactions fees goes to the miners as rewards for their verification, a consumer may set gas price high enough to encourage miners to select his transaction to be involved in their next block. The increase in the gas price may contribute in decreasing the receipt processing time RT and therefore more time to receive more batches within TATI
+\hline
+0.1  & 15 & 21 & 29 \\
 
-A minimum and the maximum gas price in the network could be known and limit in ETH Gas Station \cite{13}.  ETH Gas Station is a tool to understand the conditions of the current gas market and current policies of network miners. 
+\hline
+0.2  & 8 & 11 & 16 \\
 
-Based on the current condition of the network at the moment of writing, the recommended gas prices from \cite{13} has been shown in table \ref{GasPriceTable} . It shows the maximum time taken by miners to confirm the transaction for each GP. In addition, \cite{13} provides the median time of transaction confirmation for each gas price.
+\hline
+0.3  & 6 & 7 & 11 \\
+
+\hline
+0.4  & 5 & 6 & 9 \\
+
+\hline
+0.5  & 4 & 5 & 7 \\
+
+\hline
+0.6  & 3 & 4 & 6 \\
+
+\hline
+0.7  & 3 & 3 & 6 \\
+
+\hline
+0.8  & 3 & 3 & 5 \\
+
+\hline
+0.9  & 3 & 3 & 5 \\
+
+\hline
+1  & \textbf{2} & \textbf{3} & \textbf{4}  \\
+
+\hline
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+
+ The constant $1.38$ in table\ref{ReceiptNumber} shows that the minimum number of receipts is $2$ for $C_{rep} = 1$ and increases to $3$ for $0.5 \leq C_{rep} \leq 0.9$  which is not fair enough to have the same number of receipts. Wile in the constant $2.10$, the minimum receipt numbers has became for reputation band  $C_{rep} \geq 0.7$. The constant $2.77$ shows that the minimum number of receipts for $C_{rep} = 1$ while it bands the reputations fairly enough for $0.6 \leq C_{rep} \leq 0.7$ with $6$ receipts and for $0.8 \leq C_{rep} \leq 0.9$ with $5$ receipts.
+ 
+Because the focus of our experiment is the relation between the cost and the consumer honesty, We have chosen the constant $2.77$ which shows fair distinguish in consumer bands based on their reputation. On the other hand, it reduces the loos a producer could have in case a receipt has not been sent. 
+
+The increase in a number of batches received means that a consumer will incur more gas. If we assume that a producer has no incentive not to send the data as agreed in the TA, and with a guarantee the quality of service, a trade would be failed if a consumer was not send a receipt or was not honest in reporting the exact number of messages he received. It is crucial for a marketplace sustainability to have an honest consumer in order to have successful trades, and also for the consumer financial affairs to be avoided from many smart contract invocations and therefore extra cost (receipt cost).
+
+Because $GUP$ determines the  time of the transactions in the blockchain to be confirmed by miners, a consumer has the potential to increase the $GUP$ in order to process his transaction faster and therefore he will have more time to receive more batches. 
+
+It has to notice that the transaction of sending receipts to the smart contract has to be processed in the period of time, so a consumer may increase $GUP$ of his transactions to give it the priority to be picked by miners. Miners who will validate the transactions usually follow the strategy of picking the transactions’ heights $GUP$ to be included in the next block in order for high rewards. Because of the transactions fees goes to the miners as rewards for their verification, a consumer may set $GUP$ high enough to encourage miners to select his transaction to be involved in their next block. The increase in $GUP$ may contribute in decreasing $RT$ and therefore more time to receive more data messages within $TATI$
+
+A minimum and the maximum $GUP$ in the network could be known and limit in ETH Gas Station (\url{ethgasstation.info}).  This is a tool to understand the conditions of the current gas market and current policies of network miners. 
+Based on the current condition of the network at the moment of writing, the recommended gas prices from Gas Station is shown in table \ref{GasPriceTable}. It shows the maximum time taken by miners to confirm the transaction for each $GUP$. In addition, the Gas Station provides the median time of transaction confirmation for each $GUP$.
+
 \begin{table}[h]
 \caption{Gas Prices and Speeds}
 \label{GasPriceTable}
@@ -671,10 +765,10 @@ Based on the current condition of the network at the moment of writing, the reco
 \textbf{\makecell{Gas Price\\ (Gwei)}} &\textbf{Speed} & \textbf{Median Speed}\\
 
 \hline
-1.6  & SafeLow (\textless30m) & 2.5m \\
+1.6  & SafeLow (\textless30m) & 4.3m \\
 
 \hline
-4.2  & Standard (\textless5m) & 1.5m \\
+4.2  & Standard (\textless5m) & 2.5m \\
 \hline
 7.2  & Fast (\textless2m) & 0.8m \\
 
@@ -683,39 +777,55 @@ Based on the current condition of the network at the moment of writing, the reco
 \end{center}
 \end{table}
 
-For the purpose of evaluating that the cost is inversely proportional to the reputation, we have fixed the parameters TATI with 1 day (24 hours), GUA and GUS as mentioned earlier in table \ref{GasTable} and use the three different GP for different consumer reputations to calculate the $C_{cost}$ (Eq.\ref{FCostEq}) in table \ref{CostTable} 
+For the purpose of evaluation, we have used the three different $GUP$ for different consumer reputations to calculate the $RC$ (\ref{RC}). 
 
 
 \begin{table}[h]
 % \begin{center}
-\caption{Shows the cost in USD for consumer reputations for 1 day trade with three GP values, Rate 100 msg/sec. (1 Eth $\approx$ 202.70 USD)}
+\caption{Shows the RC in USD and Data Percentage Delivered for consumer reputations for 1 day trade with three GUP values, MR=100 msg/sec. (1 Eth $\approx$ 202.70 USD)}
 \label{CostTable}
 % \begin{center}
 \begin{adjustbox}{width=0.48\textwidth}
-\begin{tabular}{|c||c||c||c|}
+\begin{tabular}{|c||c||c||c||c||c||c|}
 \hline
-\textbf{Consumer} & \multicolumn{3}{c}{\textbf{Consumer Cost (Setup + Authentication) in USD}}\\ 
-\textbf{Reputation}  & \textbf{ GP= 1.6 Gwei} & \textbf{GP = 4.2 Gwei} & \textbf{GP= 7.2 Gwei} \\ 
+\textbf{Consumer} & \multicolumn{2}{c}{\textbf{GUP= 1.6 Gwei}} &
+\multicolumn{2}{c}{\textbf{GUP= 4.2 Gwei}}  & 
+\multicolumn{2}{c}{\textbf{GUP= 7.2 Gwei}}\\ 
+
+
+
+\textbf{Reputation} & \textbf{\makecell{Cost\\in USD}} & \textbf{\makecell{Data\\ Percentage}} & \textbf{\makecell{Cost\\in USD}} & \textbf{\makecell{Data\\ Percentage}}
+& \textbf{ \makecell{Cost\\in USD}} & \textbf{\makecell{Data\\ Percentage}}\\ 
 \hline
-$0.1$ & $ 25.48 \$ $ & $ 106.72 \$ $ & $ 314.98 \$ $ \\
+$0.1$ & $ 1.465 \$ $ & $92.236 \%$ &  $ 3.970 \$ $ & $95.313 \% $ &  $ 7.016 \$ $ & $ 98.444 \%$\\
+
 \hline
-$0.2$ & $ 24.04 \$ $ & $ 97.19 \$ $ & $ 268.82 \$ $ \\
+$0.2$ & $ 0.903 \$ $ & $95.81 \%$ &  $ 2.372 \$ $ & $97.57 \%$ &  $ 4.277 \$ $ & $99.17 \%$ \\
+
 \hline
-$0.3$ & $ 22.68 \$ $ & $ 89.02 \$ $ & $ 234.50 \$ $ \\
+$0.3$ & $ 0.716 \$ $ & $97.01 \%$ & $ 1.881 \$ $ &$98.26 \%$& $ 3.224 \$ $ & $99.44 \%$ \\
+
 \hline
-$0.4$ & $ 21.54 \$ $ & $ 82.33 \$ $ & $ 207.98 \$ $ \\
+$0.4$ & $ 0.623 \$ $ & $97.61 \%$& $ 1.635 \$ $ & $98.61 \%$&$ 2.802 \$ $ & $99.55 \%$ \\
+
 \hline
-$0.5$ & $ 20.43 \$ $ & $ 76.50 \$ $ & $ 186.87 \$ $ \\
+$0.5$ & $ 0.529 \$ $ &$98.20 \%$ & $ 1.389 \$ $ &$98.95 \%$ & $ 2.381 \$ $ & $99.66 \%$ \\
+
 \hline
-$0.6$ & $ 19.51 \$ $ & $ 71.32 \$ $ & $ 169.46 \$ $ \\
+$0.6$ & $ 0.482 \$ $ &$98.51 \%$ & $ 1.266 \$ $ &$99.13 \%$ & $ 2.170 \$ $ &$99.72 \%$\\
+
 \hline
-$0.7$ & $ 18.64 \$ $ & $ 66.90 \$ $ & $ 155.39 \$ $ \\
+$0.7$ & $ 0.482 \$ $ &$98.51 \%$ & $ 1.266 \$ $ & $99.13 \%$& $ 2.170 \$ $ & $99.72 \%$\\
+
 \hline
-$0.8$ & $ 17.84 \$ $ & $ 63.12 \$ $ & $ 143.36 \$ $ \\
+$0.8$ & $ 0.435 \$ $ &$98.81 \%$ & $ 1.143 \$ $ & $99.30 \%$& $ 1.960 \$ $ &$99.78 \%$ \\
+
 \hline
-$0.9$ & $ 17.06 \$ $ & $ 59.52 \$ $ & $ 133.03 \$ $ \\
+$0.9$ & $ 0.435 \$ $ & $98.81 \%$& $ 1.143 \$ $ & $99.31 \%$& $ 1.960 \$ $ & $99.78 \%$\\
+
 \hline
-$1.0$ & $ 16.43 \$ $ & $ 56.54 \$ $ & $ 124.12 \$ $ \\
+$1.0$ & $ 0.388 \$ $ &$99.10 \%$ & $ 1.020 \$ $ & $99.48 \%$& $ 1.749 \$ $ & $99.83 \%$\\
+
 \hline 
 
 \end{tabular}
@@ -739,94 +849,20 @@ $1.0$ & $ 16.43 \$ $ & $ 56.54 \$ $ & $ 124.12 \$ $ \\
  
 % It is worth to mention that in terms of data producer, he checks the consumer reputation in order to approve a consumer request. The increase in consumer cost by increasing the gas price is not necessary for a producer to accept consumer request and initiate a new trade. While it could be a vital factor for a consumer to increase his reputation faster if and only if the current trade ends successfully. It depends on a producer decision to take this risk and get involve in this trade.
 
-It is worth to mention that in terms of consumer cost as shown in table \ref{CostTable}, many consumers would prefer to pay the lowest gas possible  because the difference between the cost for a 0.1 consumer reputation and 1.0 is only 9.05 \$ and it is not very high value for one day trade. But In terms of data amount received, figure \ref{2FigEvaluation} (c) has shown that the former has received only about 6.25 \% from the estimated data delivered while the latter has received about 40.10 \% and in real-time data trades, the amount of trade received is the core factor for the consumer, otherwise, the data will lose its value if it is received after long time of its generation. 
 
+It is worth to mention that the maximum data could be delivered for $C_{rep} = 1 $ for $GUP$ $1.6 Gwei$, $4.2 Gwei$ and $7.2 Gwei$ are $99.10 \%$, $99.48 \%$ and $99.83 \%$, respectively. If we assuming that the minimum time for a transaction to be confirmed is about second, so that the maximum number of messages could be delivered to a consumer is $ \leq (ETM - MR * BN)$. The overhead of processing the receipts -represented as $RT$ - is included in $TATI$ which reduce streaming the data for $RT * BN$.
 
-% \section{MATH}
+Although the number of receipts as shown in figure\ref{2FigEvaluation} (a) are nearly the same which lead to the equal cost for receipts as shown in figure\ref{2FigEvaluation} (b), the data percentage received are more than for a higher reputation consumer, figure\ref{2FigEvaluation} (c)
 
-% Before you begin to format your paper, first write and save the content as a separate text file. Keep your text and graphic files separate until after the text has been formatted and styled. Do not use hard tabs, and limit use of hard returns to only one return at the end of a paragraph. Do not add any kind of pagination anywhere in the paper. Do not number text heads-the template will do that for you.
+% It is worth to mention that in terms of consumer cost as shown in table \ref{CostTable}, many consumers would prefer to pay the lowest $GUP$ possible because the difference between the cost for a 0.1 consumer reputation and 1.0 is only 9.05 \$ and it is not very high value for one day trade. But In terms of data amount received, figure \ref{2FigEvaluation} (c) has shown that the former has received only about 6.25 \% from the estimated data delivered while the latter has received about 40.10 \% and in real-time data trades, the amount of trade received is the core factor for the consumer, otherwise, the data will lose its value if it is received after long time of its generation. 
 
-% Finally, complete content and organizational editing before formatting. Please take note of the following items when proofreading spelling and grammar:
-
-% \subsection{Abbreviations and Acronyms} Define abbreviations and acronyms the first time they are used in the text, even after they have been defined in the abstract. Abbreviations such as IEEE, SI, MKS, CGS, sc, dc, and rms do not have to be defined. Do not use abbreviations in the title or heads unless they are unavoidable.
-
-% \subsection{Units}
-
-% \begin{itemize}
-
-% \item Use either SI (MKS) or CGS as primary units. (SI units are encouraged.) English units may be used as secondary units (in parentheses). An exception would be the use of English units as identifiers in trade, such as Ò3.5-inch disk driveÓ.
-% \item Avoid combining SI and CGS units, such as current in amperes and magnetic field in oersteds. This often leads to confusion because equations do not balance dimensionally. If you must use mixed units, clearly state the units for each quantity that you use in an equation.
-% \item Do not mix complete spellings and abbreviations of units: ÒWb/m2Ó or Òwebers per square meterÓ, not Òwebers/m2Ó.  Spell out units when they appear in text: Ò. . . a few henriesÓ, not Ò. . . a few HÓ.
-% \item Use a zero before decimal points: Ò0.25Ó, not Ò.25Ó. Use Òcm3Ó, not ÒccÓ. (bullet list)
-
-% \end{itemize}
-
-
-% \subsection{Equations}
-
-% The equations are an exception to the prescribed specifications of this template. You will need to determine whether or not your equation should be typed using either the Times New Roman or the Symbol font (please no other font). To create multileveled equations, it may be necessary to treat the equation as a graphic and insert it into the text after your paper is styled. Number equations consecutively. Equation numbers, within parentheses, are to position flush right, as in (1), using a right tab stop. To make your equations more compact, you may use the solidus ( / ), the exp function, or appropriate exponents. Italicize Roman symbols for quantities and variables, but not Greek symbols. Use a long dash rather than a hyphen for a minus sign. Punctuate equations with commas or periods when they are part of a sentence, as in
-
-% $$
-% \alpha + \beta = \chi \eqno{(1)}
-% $$
-
-% Note that the equation is centered using a center tab stop. Be sure that the symbols in your equation have been defined before or immediately following the equation. Use Ò(1)Ó, not ÒEq. (1)Ó or Òequation (1)Ó, except at the beginning of a sentence: ÒEquation (1) is . . .Ó
-
-% \subsection{Some Common Mistakes}
-% \begin{itemize}
-
-
-% \item The word ÒdataÓ is plural, not singular.
-% \item The subscript for the permeability of vacuum ?0, and other common scientific constants, is zero with subscript formatting, not a lowercase letter ÒoÓ.
-% \item In American English, commas, semi-/colons, periods, question and exclamation marks are located within quotation marks only when a complete thought or name is cited, such as a title or full quotation. When quotation marks are used, instead of a bold or italic typeface, to highlight a word or phrase, punctuation should appear outside of the quotation marks. A parenthetical phrase or statement at the end of a sentence is punctuated outside of the closing parenthesis (like this). (A parenthetical sentence is punctuated within the parentheses.)
-% \item A graph within a graph is an ÒinsetÓ, not an ÒinsertÓ. The word alternatively is preferred to the word ÒalternatelyÓ (unless you really mean something that alternates).
-% \item Do not use the word ÒessentiallyÓ to mean ÒapproximatelyÓ or ÒeffectivelyÓ.
-% \item In your paper title, if the words Òthat usesÓ can accurately replace the word ÒusingÓ, capitalize the ÒuÓ; if not, keep using lower-cased.
-% \item Be aware of the different meanings of the homophones ÒaffectÓ and ÒeffectÓ, ÒcomplementÓ and ÒcomplimentÓ, ÒdiscreetÓ and ÒdiscreteÓ, ÒprincipalÓ and ÒprincipleÓ.
-% \item Do not confuse ÒimplyÓ and ÒinferÓ.
-% \item The prefix ÒnonÓ is not a word; it should be joined to the word it modifies, usually without a hyphen.
-% \item There is no period after the ÒetÓ in the Latin abbreviation Òet al.Ó.
-% \item The abbreviation Òi.e.Ó means Òthat isÓ, and the abbreviation Òe.g.Ó means Òfor exampleÓ.
-
-% \end{itemize}
-
-
-% \section{USING THE TEMPLATE}
-
-% Use this sample document as your LaTeX source file to create your document. Save this file as {\bf root.tex}. You have to make sure to use the cls file that came with this distribution. If you use a different style file, you cannot expect to get required margins. Note also that when you are creating your out PDF file, the source file is only part of the equation. {\it Your \TeX\ $\rightarrow$ PDF filter determines the output file size. Even if you make all the specifications to output a letter file in the source - if you filter is set to produce A4, you will only get A4 output. }
-
-% It is impossible to account for all possible situation, one would encounter using \TeX. If you are using multiple \TeX\ files you must make sure that the ``MAIN`` source file is called root.tex - this is particularly important if your conference is using PaperPlaza's built in \TeX\ to PDF conversion tool.
-
-% \subsection{Headings, etc}
-
-% Text heads organize the topics on a relational, hierarchical basis. For example, the paper title is the primary text head because all subsequent material relates and elaborates on this one topic. If there are two or more sub-topics, the next level head (uppercase Roman numerals) should be used and, conversely, if there are not at least two sub-topics, then no subheads should be introduced. Styles named ÒHeading 1Ó, ÒHeading 2Ó, ÒHeading 3Ó, and ÒHeading 4Ó are prescribed.
-
-% \subsection{Figures and Tables}
-
-% Positioning Figures and Tables: Place figures and tables at the top and bottom of columns. Avoid placing them in the middle of columns. Large figures and tables may span across both columns. Figure captions should be below the figures; table heads should appear above the tables. Insert figures and tables after they are cited in the text. Use the abbreviation ÒFig. 1Ó, even at the beginning of a sentence.
-
-
-
-%   \begin{figure}[thpb]
-%       \centering
-%       \framebox{\parbox{3in}{We suggest that you use a text box to insert a graphic (which is ideally a 300 dpi TIFF or EPS file, with all fonts embedded) because, in an document, this method is somewhat more stable than directly inserting a picture.
-% }}
-%       %\includegraphics[scale=1.0]{figurefile}
-%       \caption{Inductance of oscillation winding on amorphous
-%       magnetic core versus DC bias magnetic field}
-%       \label{figurelabel}
-%   \end{figure}
-   
-
-% Figure Labels: Use 8 point Times New Roman for Figure labels. Use words rather than symbols or abbreviations when writing Figure axis labels to avoid confusing the reader. As an example, write the quantity ÒMagnetizationÓ, or ÒMagnetization, MÓ, not just ÒMÓ. If including units in the label, present them within parentheses. Do not label axes only with units. In the example, write ÒMagnetization (A/m)Ó or ÒMagnetization {A[m(1)]}Ó, not just ÒA/mÓ. Do not label axes with a ratio of quantities and units. For example, write ÒTemperature (K)Ó, not ÒTemperature/K.Ó
 
 \section{CONCLUSIONS} \label{conclusion}
 
-This paper introduces a decentralized marketplace for trading brokered IoT data, and leverage the model with blockchain technology as distributed, immutable and public records. It is structured into two entities: (1) the standard IoT brokered data protocol and on the top and (2) the settlement system provider (as an automated smart contracts on the blockchain network). Every trade has a trade contract signed by both participants and then kept in the blockchain. A TA is a tuple of all trade details between a producer and a consumer.
+This paper introduces a decentralized marketplace for trading brokered IoT data, and leverage the model with blockchain technology as distributed, immutable and public records. It is structured into two entities: (1) the standard IoT brokered data protocol and on the top and (2) the receipt protocol (as an automated smart contracts on the blockchain network). Every trade has a trade contract signed by both participants and then kept in the blockchain. A TA is a tuple of all trade details between a producer and a consumer.
 
-While the approach in this model is a receipt-based, the real-time data stream is divided into batches which is a linear function of a consumer honesty in the marketplace. A consumer honesty is measured by the consumer commitment to send a receipt for every data delivered in each batch.
-As shown, the expenses of having a trade on the blockchain has been categorized into four; registration fees, offering fees, setup fees and the authentication fees. 
-There is a inverse proportion between a consumer reputation and an authentication cost. The evaluation shows that the consumer with high reputation get a small number of batches and therefore less number of smart contract interaction to send receipts. A consumer with low reputation get high number of batches and therefore more gas consumed to interact with the smart contract to send the receipts. 
+While the approach is a receipt-based, the real-time data stream is divided into batches which is a logarithmic function of a consumer honesty in the marketplace. As shown, the expenses of having a trade on the blockchain has been categorized into four; registration fees, offering fees, setup fees and the receipt fees. 
+There is a inverse proportion between a consumer reputation and an receipt cost. A $f(C_{rep})$ is a directly proportional to $BS$. The evaluation shows that the consumer with high reputation get a small number of batches and therefore less number of smart contract interaction to send receipts. A consumer with low reputation get high number of batches and therefore more gas consumed to interact with the smart contract to send the receipts. 
 
 % \addtolength{\textheight}{-12cm}   % This command serves to balance the column lengths
 %                                   % on the last page of the document manually. It shortens
